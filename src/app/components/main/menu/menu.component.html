@@ -1,0 +1,39 @@
+<aside class="sidebar-shell">
+  <div class="brand-block">
+    <div class="brand-mark">
+      <span class="bar bar-sm"></span>
+      <span class="bar bar-md"></span>
+      <span class="bar bar-lg"></span>
+    </div>
+    <div class="brand-copy">
+      <h1>OBRAX</h1>
+      <span>GESTÃO DE OBRAS</span>
+    </div>
+  </div>
+
+  <div class="menu-tree">
+    <ejs-treeview
+      id="treeelement"
+      [fields]="field"
+      [expandOn]="'Click'"
+      (nodeClicked)="nodeClicked($event)">
+      <ng-template #nodeTemplate let-data>
+        <div class="menu-node" [class.menu-category]="data.category">
+          @if (!data.category) {
+            <span class="menu-icon icon-{{ data.iconKey }}"></span>
+          }
+          <span class="menu-text">{{ data.name }}</span>
+        </div>
+      </ng-template>
+    </ejs-treeview>
+  </div>
+
+  <div class="sidebar-user orb-card">
+    <div class="avatar">A</div>
+    <div class="user-copy">
+      <strong>{{ userName }}</strong>
+      <span>Master</span>
+    </div>
+    <button type="button" class="logout-btn" (click)="logout()">Sair</button>
+  </div>
+</aside>

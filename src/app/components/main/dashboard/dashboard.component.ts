@@ -1,0 +1,150 @@
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { finalize } from 'rxjs';
+import { AdminDashboardViewModel, SummaryCard } from '../../../models/admin-dashboard';
+import { AdminDashboardService } from '../../../services/admin-dashboard.service';
+import { LoginService } from '../../../services/login.service';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, GridModule],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss'
+})
+export class DashboardComponent {
+  loading = true;
+  errorMessage = '';
+  viewModel: AdminDashboardViewModel = {
+    cards: [],
+    planDistribution: [],
+    subscriptionDistribution: [],
+    storageTrend: [],
+    recentAccess: [],
+    recentLogs: [],
+    alerts: [],
+    footerStats: []
+  };
+
+  accessColumns = [
+    { field: 'company', headerText: 'Empresa', width: 180 },
+    { field: 'user', headerText: 'Usuário', width: 170 },
+    { field: 'dateTime', headerText: 'Data/Hora', width: 130 },
+    { field: 'ip', headerText: 'IP', width: 120 }
+  ];
+
+  logColumns = [
+    { field: 'title', headerText: 'Evento', width: 220 },
+    { field: 'dateTime', headerText: 'Data/Hora', width: 130 },
+    { field: 'type', headerText: 'Tipo', width: 90 }
+  ];
+
+  constructor(
+    private loginService: LoginService,
+    private dashboardService: AdminDashboardService
+  ) {}
+
+  ngOnInit(): void {
+    const token = this.loginService.getToken();
+    if (!token) {
+      this.errorMessage = 'Sessão master não encontrada.';
+      this.loading = false;
+      return;
+    }
+
+    this.dashboardService
+      .load(token)
+      .pipe(finalize(() => (this.loading = false)))
+      .subscribe({
+        next: (viewModel) => {
+          this.viewModel = viewModel;
+        },
+        error: (error) => {
+          this.errorMessage = error?.error?.message || 'Falha ao carregar o dashboard administrativo.';
+        }
+      });
+  }
+
+  trackByTitle(_: number, item: SummaryCard): string {
+    return item.title;
+  }
+
+  distributionPercent(total: number, value: number): string {
+    if (!total) {
+      return '0%';
+    }
+
+    return `${((value / total) * 100).toFixed(1).replace('.', ',')}%`;
+  }
+
+  linePoints(values: number[]): string {
+    const width = 188;
+    const height = 52;
+    const max = Math.max(...values, 1);
+    const step = width / Math.max(values.length - 1, 1);
+
+    return values
+      .map((value, index) => {
+        const x = index * step;
+        const y = height - (value / max) * height;
+        return `${x},${y}`;
+      })
+      .join(' ');
+  }
+
+  donutBackground(items: Array<{ color: string; value: number }>): string {
+    const total = items.reduce((sum, item) => sum + item.value, 0) || 1;
+    let start = 0;
+    const segments = items.map((item) => {
+      const size = (item.value / total) * 100;
+      const segment = `${item.color} ${start}% ${start + size}%`;
+      start += size;
+      return segment;
+    });
+
+    return `conic-gradient(${segments.join(', ')})`;
+  }
+
+  areaPath(): string {
+    const points = this.viewModel.storageTrend;
+    if (!points.length) {
+      return '';
+    }
+
+    const width = 420;
+    const height = 210;
+    const max = Math.max(...points.map(item => item.value), 1);
+    const step = width / Math.max(points.length - 1, 1);
+
+    const line = points
+      .map((point, index) => {
+        const x = index * step;
+        const y = height - (point.value / max) * height;
+        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ');
+
+    return `${line} L ${width} ${height} L 0 ${height} Z`;
+  }
+
+  areaLine(): string {
+    const points = this.viewModel.storageTrend;
+    if (!points.length) {
+      return '';
+    }
+
+    const width = 420;
+    const height = 210;
+    const max = Math.max(...points.map(item => item.value), 1);
+    const step = width / Math.max(points.length - 1, 1);
+
+    return points
+      .map((point, index) => {
+        const x = index * step;
+        const y = height - (point.value / max) * height;
+        return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
+      })
+      .join(' ');
+  }
+}
