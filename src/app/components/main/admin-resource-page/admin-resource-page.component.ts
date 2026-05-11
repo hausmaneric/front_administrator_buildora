@@ -256,7 +256,7 @@ export class AdminResourcePageComponent {
 
   private loadSupportOptions(token: string): void {
     if (this.resource === 'accounts' || this.resource === 'accountModules') {
-      this.adminDataService.plans(token, { limit: 200, offset: 0 }).subscribe({
+      this.adminDataService.plans(token).subscribe({
         next: (response) => {
           this.planOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: item.name }));
         }
@@ -264,12 +264,12 @@ export class AdminResourcePageComponent {
     }
 
     if (this.resource === 'accountModules') {
-      this.adminDataService.accounts(token, { limit: 200, offset: 0 }).subscribe({
+      this.adminDataService.accounts(token).subscribe({
         next: (response) => {
           this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} - ${item.name}` }));
         }
       });
-      this.adminDataService.modules(token, { limit: 200, offset: 0 }).subscribe({
+      this.adminDataService.modules(token).subscribe({
         next: (response) => {
           this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} - ${item.name}` }));
         }

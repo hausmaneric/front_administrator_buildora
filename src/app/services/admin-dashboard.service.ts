@@ -19,11 +19,11 @@ export class AdminDashboardService {
 
   load(token: string): Observable<AdminDashboardViewModel> {
     return forkJoin({
-      accounts: this.adminDataService.accounts(token, { limit: 200, offset: 0 }),
-      plans: this.adminDataService.plans(token, { limit: 200, offset: 0 }),
-      modules: this.adminDataService.modules(token, { limit: 200, offset: 0 }),
+      accounts: this.adminDataService.accounts(token),
+      plans: this.adminDataService.plans(token),
+      modules: this.adminDataService.modules(token),
       masterUsers: this.adminDataService.masterUsers(token),
-      accountModules: this.adminDataService.accountModules(token, { limit: 200, offset: 0 }),
+      accountModules: this.adminDataService.accountModules(token),
       environment: this.adminDataService.environment(),
       ready: this.adminDataService.ready()
     }).pipe(

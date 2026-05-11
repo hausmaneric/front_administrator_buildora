@@ -64,7 +64,7 @@ export class TenantBootstrapPageComponent {
       return;
     }
 
-    this.adminDataService.accounts(token, { limit: 200, offset: 0 })
+    this.adminDataService.accounts(token)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (response) => {
