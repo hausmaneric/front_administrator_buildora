@@ -22,7 +22,7 @@ export class AdminDashboardService {
       accounts: this.adminDataService.accounts(token, { limit: 200, offset: 0 }),
       plans: this.adminDataService.plans(token, { limit: 200, offset: 0 }),
       modules: this.adminDataService.modules(token, { limit: 200, offset: 0 }),
-      masterUsers: this.adminDataService.masterUsers(token, { limit: 200, offset: 0 }),
+      masterUsers: this.adminDataService.masterUsers(token),
       accountModules: this.adminDataService.accountModules(token, { limit: 200, offset: 0 }),
       environment: this.adminDataService.environment(),
       ready: this.adminDataService.ready()
