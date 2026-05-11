@@ -17,6 +17,7 @@ type DialogMode = 'create' | 'edit' | 'duplicate';
 type ResourceConfig = {
   columns: Array<{ field: string; headerText: string; width?: number }>;
   sortField: string;
+  supportsPaging?: boolean;
   list: (params: Record<string, any>) => Observable<any>;
   create: (payload: Record<string, any>) => Observable<any>;
   update: (payload: Record<string, any>) => Observable<any>;
@@ -171,6 +172,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updateAccount(token, payload),
           remove: (id) => this.adminDataService.deleteAccount(token, id),
           sortField: 'created_at',
+          supportsPaging: true,
           columns: [
             { field: 'code', headerText: 'Codigo', width: 110 },
             { field: 'name', headerText: 'Conta', width: 220 },
@@ -186,6 +188,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updatePlan(token, payload),
           remove: (id) => this.adminDataService.deletePlan(token, id),
           sortField: 'created_at',
+          supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
             { field: 'description', headerText: 'Descricao', width: 260 },
@@ -201,6 +204,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updateModule(token, payload),
           remove: (id) => this.adminDataService.deleteModule(token, id),
           sortField: 'created_at',
+          supportsPaging: true,
           columns: [
             { field: 'code', headerText: 'Codigo', width: 120 },
             { field: 'name', headerText: 'Nome', width: 220 },
@@ -214,6 +218,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updateMasterUser(token, payload),
           remove: (id) => this.adminDataService.deleteMasterUser(token, id),
           sortField: 'created_at',
+          supportsPaging: false,
           columns: [
             { field: 'name', headerText: 'Nome', width: 220 },
             { field: 'login', headerText: 'Login', width: 150 },
@@ -228,6 +233,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updateAccountModule(token, payload),
           remove: (id) => this.adminDataService.deleteAccountModule(token, id),
           sortField: 'created_at',
+          supportsPaging: true,
           columns: [
             { field: 'account_name', headerText: 'Conta', width: 220 },
             { field: 'module_code', headerText: 'Modulo', width: 140 },
@@ -242,6 +248,7 @@ export class AdminResourcePageComponent {
           update: (payload) => this.adminDataService.updateAccount(token, payload),
           remove: (id) => this.adminDataService.deleteAccount(token, id),
           sortField: 'created_at',
+          supportsPaging: true,
           columns: []
         };
     }
@@ -279,14 +286,17 @@ export class AdminResourcePageComponent {
     this.loading = true;
     this.persistState();
     const config = this.resourceConfig(token);
+    const requestParams = config.supportsPaging === false
+      ? {}
+      : {
+          search: this.appliedSearch,
+          sort_field: this.sortField,
+          sort_direction: this.sortDirection,
+          limit: this.pageSize,
+          offset: this.offset
+        };
     config
-      .list({
-        search: this.appliedSearch,
-        sort_field: this.sortField,
-        sort_direction: this.sortDirection,
-        limit: this.pageSize,
-        offset: this.offset
-      })
+      .list(requestParams)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (response) => {
@@ -298,6 +308,12 @@ export class AdminResourcePageComponent {
           this.totalItems = pagination?.total ?? this.rows.length;
           this.hasNext = pagination?.has_next ?? false;
           this.currentPage = Math.floor(this.offset / this.pageSize) + 1;
+          if (config.supportsPaging === false) {
+            this.returnedCount = this.rows.length;
+            this.totalItems = this.rows.length;
+            this.hasNext = false;
+            this.currentPage = 1;
+          }
         },
         error: (error: any) => {
           this.placeholder = true;
