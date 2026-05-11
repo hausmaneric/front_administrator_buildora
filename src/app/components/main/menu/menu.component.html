@@ -12,20 +12,24 @@
   </div>
 
   <div class="menu-tree">
-    <ejs-treeview
-      id="treeelement"
-      [fields]="field"
-      [expandOn]="'Click'"
-      (nodeClicked)="nodeClicked($event)">
-      <ng-template #nodeTemplate let-data>
-        <div class="menu-node" [class.menu-category]="data.category">
-          @if (!data.category) {
-            <span class="menu-icon icon-{{ data.iconKey }}"></span>
+    <button type="button" class="menu-link root-link" [class.active]="isActive(dashboardItem.route)" (click)="navigate(dashboardItem.route)">
+      <span class="menu-icon icon-{{ dashboardItem.iconKey }}"></span>
+      <span class="menu-text">{{ dashboardItem.name }}</span>
+    </button>
+
+    @for (section of sections; track section.id) {
+      <section class="menu-section">
+        <div class="menu-section-title">{{ section.name }}</div>
+        <div class="menu-section-items">
+          @for (item of section.items; track item.id) {
+            <button type="button" class="menu-link" [class.active]="isActive(item.route)" (click)="navigate(item.route)">
+              <span class="menu-icon icon-{{ item.iconKey }}"></span>
+              <span class="menu-text">{{ item.name }}</span>
+            </button>
           }
-          <span class="menu-text">{{ data.name }}</span>
         </div>
-      </ng-template>
-    </ejs-treeview>
+      </section>
+    }
   </div>
 
   <div class="sidebar-user orb-card">

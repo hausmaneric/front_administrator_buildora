@@ -1,37 +1,44 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { NodeClickEventArgs, TreeViewModule } from '@syncfusion/ej2-angular-navigations';
+import { Router, RouterModule } from '@angular/router';
 import { LoginService } from '../../../services/login.service';
+
+type MenuItem = {
+  id: string;
+  name: string;
+  iconKey: string;
+  route: string;
+};
+
+type MenuSection = {
+  id: string;
+  name: string;
+  items: MenuItem[];
+};
 
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [TreeViewModule, CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })
 export class MenuComponent {
   userName = 'Administrador';
+  currentRoute = '';
 
-  constructor(
-    private router: Router,
-    private loginService: LoginService
-  ) {}
+  dashboardItem: MenuItem = {
+    id: 'dashboard',
+    name: 'Dashboard',
+    iconKey: 'home',
+    route: '/main/dashboard'
+  };
 
-  public hierarchicalData: any[] = [
-    {
-      id: 'dashboard',
-      name: 'Dashboard',
-      iconKey: 'home',
-      route: '/main/dashboard'
-    },
+  sections: MenuSection[] = [
     {
       id: 'gestao',
       name: 'GESTÃO',
-      expanded: true,
-      category: true,
-      subChild: [
+      items: [
         { id: 'accounts', name: 'Empresas / Contas', iconKey: 'briefcase', route: '/main/accounts' },
         { id: 'plans', name: 'Planos', iconKey: 'wallet', route: '/main/plans' },
         { id: 'modules', name: 'Módulos', iconKey: 'grid', route: '/main/modules' },
@@ -45,9 +52,7 @@ export class MenuComponent {
     {
       id: 'support',
       name: 'SUPORTE E CONTROLE',
-      expanded: true,
-      category: true,
-      subChild: [
+      items: [
         { id: 'logs', name: 'Logs', iconKey: 'log', route: '/main/logs' },
         { id: 'auditing', name: 'Auditoria', iconKey: 'shield', route: '/main/auditing' },
         { id: 'backup', name: 'Backup', iconKey: 'database', route: '/main/backup' },
@@ -57,9 +62,7 @@ export class MenuComponent {
     {
       id: 'reports',
       name: 'RELATÓRIOS',
-      expanded: true,
-      category: true,
-      subChild: [
+      items: [
         { id: 'metrics', name: 'Métricas', iconKey: 'chart', route: '/main/metrics' },
         { id: 'financial', name: 'Financeiro', iconKey: 'coin', route: '/main/financial' }
       ]
@@ -67,56 +70,33 @@ export class MenuComponent {
     {
       id: 'settings',
       name: 'CONFIGURAÇÕES',
-      expanded: true,
-      category: true,
-      subChild: [{ id: 'settings-page', name: 'Configurações', iconKey: 'settings', route: '/main/settings-page' }]
+      items: [
+        { id: 'settings-page', name: 'Configurações', iconKey: 'settings', route: '/main/settings-page' }
+      ]
     }
   ];
 
-  public field: object = {
-    dataSource: this.hierarchicalData,
-    id: 'id',
-    text: 'name',
-    child: 'subChild'
-  };
+  constructor(
+    private router: Router,
+    private loginService: LoginService
+  ) {}
 
   ngOnInit(): void {
     this.userName = this.loginService.getLocalToken()?.user?.name ?? 'Administrador';
+    this.currentRoute = this.router.url;
   }
 
-  public nodeClicked(args: NodeClickEventArgs): void {
-    const id = args.node.getAttribute('data-uid');
-    if (!id) {
-      return;
-    }
+  isActive(route: string): boolean {
+    return this.currentRoute === route;
+  }
 
-    const item = this.findNode(this.hierarchicalData, id);
-    if (!item || item.category || !item.route) {
-      return;
-    }
-
-    this.router.navigate([item.route]);
+  navigate(route: string): void {
+    this.currentRoute = route;
+    this.router.navigate([route]);
   }
 
   logout(): void {
     this.loginService.clearToken();
     this.router.navigate(['/login']);
-  }
-
-  private findNode(data: any[], id: string): any {
-    for (const item of data) {
-      if (item.id === id) {
-        return item;
-      }
-
-      if (item.subChild) {
-        const found = this.findNode(item.subChild, id);
-        if (found) {
-          return found;
-        }
-      }
-    }
-
-    return null;
   }
 }
