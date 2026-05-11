@@ -4,6 +4,7 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+  overflow: hidden;
 }
 
 .brand-block {
@@ -45,6 +46,8 @@
 .menu-tree {
   flex: 1;
   min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .menu-node {
@@ -111,6 +114,8 @@
   gap: 12px;
   padding: 14px;
   border-radius: 18px;
+  margin-top: auto;
+  flex-shrink: 0;
 }
 
 .avatar {
@@ -146,6 +151,7 @@
   background: transparent;
   color: #8eb6ff;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 ::ng-deep .e-treeview {
@@ -181,4 +187,51 @@
 ::ng-deep .e-treeview .e-icon-expandable,
 ::ng-deep .e-treeview .e-icon-collapsible {
   color: #6482a8 !important;
+}
+
+@media (max-width: 1024px) {
+  .sidebar-shell {
+    padding: 18px 14px 14px;
+  }
+
+  .brand-copy h1 {
+    font-size: 1.75rem;
+  }
+
+  .menu-text {
+    font-size: 0.92rem;
+  }
+
+  .sidebar-user {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .avatar {
+    width: 42px;
+    height: 42px;
+  }
+
+  .user-copy strong {
+    font-size: 0.9rem;
+    line-height: 1.1;
+  }
+
+  .user-copy span {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .sidebar-shell {
+    width: min(86vw, 320px);
+  }
+
+  .brand-block {
+    padding-inline: 6px;
+  }
+
+  .sidebar-user {
+    border-radius: 16px;
+  }
 }

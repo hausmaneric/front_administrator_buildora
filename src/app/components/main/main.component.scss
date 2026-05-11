@@ -28,6 +28,7 @@
   flex-direction: column;
   padding: 20px 20px 0;
   transition: margin-left 0.3s ease;
+  overflow: hidden;
 }
 
 .layout-main-container.main-expanded {
@@ -37,6 +38,7 @@
 .layout-main {
   flex: 1;
   min-height: 0;
+  overflow: auto;
 }
 
 @media (max-width: 1024px) {
@@ -52,5 +54,13 @@
 
   .layout-main-container {
     padding-inline: 14px;
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .layout-main-container {
+    padding-inline: 10px;
+    padding-top: 10px;
   }
 }
