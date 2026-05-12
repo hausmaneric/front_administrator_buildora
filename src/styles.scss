@@ -89,6 +89,13 @@ a {
 .e-grid,
 .e-grid .e-gridcontent,
 .e-grid .e-gridheader,
+.e-grid .e-headercontent,
+.e-grid .e-content,
+.e-grid .e-table,
+.e-grid .e-gridheader table,
+.e-grid .e-gridcontent table,
+.e-grid .e-gridheader .e-table,
+.e-grid .e-gridcontent .e-table,
 .e-grid .e-rowcell,
 .e-grid .e-headercell {
   background: transparent !important;
@@ -101,10 +108,16 @@ a {
 }
 
 .e-grid .e-headercell {
+  background: rgba(255, 255, 255, 0.02) !important;
   color: var(--orbax-text-soft) !important;
   font-size: 12px !important;
   text-transform: uppercase;
   letter-spacing: 0.08em;
+}
+
+.e-grid .e-headercell .e-headercelldiv,
+.e-grid .e-rowcell {
+  color: var(--orbax-text) !important;
 }
 
 .e-grid .e-row:hover .e-rowcell {
@@ -122,6 +135,14 @@ a {
   color: rgba(239, 246, 255, 0.92) !important;
 }
 
+.e-grid .e-row {
+  background: transparent !important;
+}
+
+.e-grid .e-altrow {
+  background: rgba(255, 255, 255, 0.015) !important;
+}
+
 .e-toolbar,
 .e-toolbar .e-toolbar-items,
 .e-treeview,
@@ -133,12 +154,19 @@ a {
 .e-input-group,
 .e-control-wrapper.e-input-group,
 .e-ddl.e-input-group,
+.e-ddl.e-control-wrapper,
+.e-dropdownlist.e-control-wrapper,
+.e-input-group.e-control-wrapper,
 .e-input-group input,
 .e-input-group textarea,
 .e-dropdownlist,
 .e-ddl .e-input,
 .e-ddl .e-input-value,
-.e-float-input input {
+.e-float-input input,
+.e-ddl input.e-input,
+.e-ddl .e-input-group input,
+.e-input-group .e-input-group-icon,
+.e-control-wrapper .e-input-group-icon {
   background: rgba(9, 24, 44, 0.92) !important;
   color: var(--orbax-text) !important;
   border-color: rgba(147, 197, 253, 0.18) !important;
@@ -146,8 +174,25 @@ a {
 
 .e-input-group-icon,
 .e-ddl .e-input-group-icon,
-.e-ddl .e-ddl-icon {
+.e-ddl .e-ddl-icon,
+.e-ddl .e-input-group-icon.e-ddl-icon,
+.e-input-group-icon:last-child {
+  background: rgba(9, 24, 44, 0.92) !important;
   color: var(--orbax-text-soft) !important;
+}
+
+.e-input-group:not(.e-float-icon-left),
+.e-control-wrapper.e-input-group:not(.e-float-icon-left),
+.e-ddl.e-control-wrapper.e-input-group {
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+.e-input-group input.e-input,
+.e-control-wrapper input.e-input,
+.e-ddl .e-input-value,
+.e-ddl .e-input-group-icon {
+  min-height: 42px !important;
 }
 
 .e-input::placeholder,
@@ -170,6 +215,11 @@ a {
 .e-list-item.e-item-focus {
   background: rgba(47, 111, 255, 0.18) !important;
   color: white !important;
+}
+
+.e-popup .e-input-focus,
+.e-popup .e-active {
+  background: rgba(47, 111, 255, 0.18) !important;
 }
 
 .e-btn,
@@ -198,4 +248,8 @@ a {
   background: #0d2341 !important;
   color: var(--orbax-text) !important;
   border-color: rgba(147, 197, 253, 0.12) !important;
+}
+
+.e-input-focus {
+  box-shadow: 0 0 0 2px rgba(47, 111, 255, 0.18) !important;
 }

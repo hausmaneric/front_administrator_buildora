@@ -124,6 +124,29 @@
   letter-spacing: 0.06em;
 }
 
+:host ::ng-deep .resource-search .e-input-group,
+:host ::ng-deep .resource-search .e-control-wrapper,
+:host ::ng-deep .resource-controls .e-input-group,
+:host ::ng-deep .resource-controls .e-control-wrapper,
+:host ::ng-deep .create-form .e-input-group,
+:host ::ng-deep .create-form .e-control-wrapper {
+  background: rgba(9, 24, 44, 0.92) !important;
+  border: 1px solid rgba(147, 197, 253, 0.18) !important;
+  border-radius: 12px !important;
+}
+
+:host ::ng-deep .resource-controls .e-input-group-icon,
+:host ::ng-deep .create-form .e-input-group-icon,
+:host ::ng-deep .resource-search .e-input-group-icon {
+  background: rgba(9, 24, 44, 0.92) !important;
+  color: var(--orbax-text-soft) !important;
+}
+
+:host ::ng-deep .e-grid {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
 .loading-state,
 .placeholder-state {
   min-height: 220px;
@@ -288,13 +311,13 @@
 }
 
 .form-field label {
-  color: #314155;
+  color: var(--orbax-text-soft);
   font-size: 0.9rem;
   font-weight: 600;
 }
 
 .field-error {
-  color: #bf1d1d;
+  color: #ff8d8d;
   font-size: 0.8rem;
   font-weight: 600;
 }
@@ -308,7 +331,7 @@
   padding: 12px 14px;
   border-radius: 12px;
   background: rgba(239, 91, 91, 0.12);
-  color: #a61b1b;
+  color: #ffb4b4;
   font-size: 0.9rem;
 }
 

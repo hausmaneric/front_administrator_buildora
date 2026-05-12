@@ -101,6 +101,15 @@
   background: rgba(7, 18, 34, 0.45);
 }
 
+.date-picker-shell ::ng-deep .date-range-dropdown.e-control-wrapper,
+.date-picker-shell ::ng-deep .date-range-dropdown.e-input-group {
+  flex: 1;
+  min-height: 42px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
 .calendar-icon,
 .icon-search,
 .icon-bell {
@@ -144,10 +153,22 @@
   box-shadow: none !important;
 }
 
+::ng-deep .date-range-dropdown .e-input-group-icon,
+::ng-deep .date-range-dropdown .e-ddl-icon,
+::ng-deep .date-range-dropdown .e-input-group-icon:last-child {
+  background: transparent !important;
+  color: var(--orbax-text-soft) !important;
+}
+
 ::ng-deep .date-range-dropdown input,
 ::ng-deep .date-range-dropdown .e-input-value,
 ::ng-deep .date-range-dropdown .e-input-group-icon {
   color: white !important;
+}
+
+::ng-deep .date-range-dropdown input.e-input,
+::ng-deep .date-range-dropdown .e-input-value {
+  background: transparent !important;
 }
 
 @media (max-width: 980px) {
