@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
@@ -35,7 +35,7 @@ type ResourceConfig = {
 export class AdminResourcePageComponent {
   @ViewChild('createDialog') createDialog!: DialogComponent;
 
-  title = 'Gestao';
+  title = 'Gestão';
   subtitle = '';
   resource = 'placeholder';
   rows: any[] = [];
@@ -44,7 +44,7 @@ export class AdminResourcePageComponent {
   loading = true;
   saving = false;
   placeholder = false;
-  placeholderMessage = 'Modulo em preparacao.';
+  placeholderMessage = 'Módulo em preparação.';
   dialogMessage = '';
   createForm!: FormGroup;
   searchTerm = '';
@@ -53,7 +53,7 @@ export class AdminResourcePageComponent {
   offset = 0;
   currentPage = 1;
   totalItems = 0;
-  sortField = 'created_at';
+  sortField = 'id';
   sortDirection: 'asc' | 'desc' = 'desc';
   hasNext = false;
   returnedCount = 0;
@@ -70,9 +70,9 @@ export class AdminResourcePageComponent {
     { id: 'support', text: 'Suporte' }
   ];
   pageSizeOptions = [
-    { id: 10, text: '10 por pagina' },
-    { id: 20, text: '20 por pagina' },
-    { id: 50, text: '50 por pagina' }
+    { id: 10, text: '10 por página' },
+    { id: 20, text: '20 por página' },
+    { id: 50, text: '50 por página' }
   ];
   sortOptions: Array<{ id: string; text: string }> = [];
   sortDirectionOptions = [
@@ -84,13 +84,14 @@ export class AdminResourcePageComponent {
     private route: ActivatedRoute,
     private loginService: LoginService,
     private adminDataService: AdminDataService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   private toastSeed = 1;
 
   ngOnInit(): void {
-    this.title = this.route.snapshot.data['title'] ?? 'Gestao';
+    this.title = this.route.snapshot.data['title'] ?? 'Gestão';
     this.subtitle = this.route.snapshot.data['subtitle'] ?? '';
     this.resource = this.route.snapshot.data['resource'] ?? 'placeholder';
 
@@ -103,7 +104,7 @@ export class AdminResourcePageComponent {
     const token = this.loginService.getToken();
     if (!token) {
       this.placeholder = true;
-      this.placeholderMessage = 'Sessao master nao encontrada.';
+      this.placeholderMessage = 'Sessão master não encontrada.';
       this.loading = false;
       return;
     }
@@ -117,6 +118,11 @@ export class AdminResourcePageComponent {
     }));
 
     this.restoreState(config.sortField);
+
+    if (this.resource === 'accounts' || this.resource === 'accountModules') {
+      this.ensureSupportOptionsLoaded();
+    }
+
     this.loadPage();
   }
 
@@ -144,6 +150,7 @@ export class AdminResourcePageComponent {
     if (!rawState) {
       return;
     }
+
     try {
       const state = JSON.parse(rawState);
       this.searchTerm = state.searchTerm ?? '';
@@ -175,11 +182,17 @@ export class AdminResourcePageComponent {
           sortField: 'id',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Codigo', width: 110 },
+            { field: 'code', headerText: 'Código', width: 130 },
             { field: 'name', headerText: 'Conta', width: 220 },
             { field: 'document', headerText: 'Documento', width: 150 },
-            { field: 'email', headerText: 'Email', width: 220 },
-            { field: 'expiration_date', headerText: 'Expiracao', width: 130 }
+            { field: 'email', headerText: 'E-mail', width: 220 },
+            { field: 'phone', headerText: 'Telefone', width: 160 },
+            { field: 'status_label', headerText: 'Status', width: 120 },
+            { field: 'plan_name', headerText: 'Plano', width: 180 },
+            { field: 'storage_limit_label', headerText: 'Limite de armazenamento', width: 190 },
+            { field: 'storage_used_label', headerText: 'Uso atual', width: 150 },
+            { field: 'expiration_date_label', headerText: 'Expiração', width: 140 },
+            { field: 'active_label', headerText: 'Ativo', width: 110 }
           ]
         };
       case 'plans':
@@ -192,10 +205,13 @@ export class AdminResourcePageComponent {
           supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
-            { field: 'description', headerText: 'Descricao', width: 260 },
-            { field: 'price', headerText: 'Preco', width: 120 },
-            { field: 'max_users', headerText: 'Usuarios', width: 110 },
-            { field: 'max_storage_mb', headerText: 'Armazenamento MB', width: 160 }
+            { field: 'description', headerText: 'Descrição', width: 260 },
+            { field: 'price_label', headerText: 'Preço', width: 140 },
+            { field: 'max_companies', headerText: 'Máx. empresas', width: 130 },
+            { field: 'max_users', headerText: 'Máx. usuários', width: 130 },
+            { field: 'max_works', headerText: 'Máx. obras', width: 120 },
+            { field: 'max_storage_label', headerText: 'Armazenamento', width: 160 },
+            { field: 'active_label', headerText: 'Ativo', width: 110 }
           ]
         };
       case 'modules':
@@ -207,9 +223,10 @@ export class AdminResourcePageComponent {
           sortField: 'id',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Codigo', width: 120 },
+            { field: 'code', headerText: 'Código', width: 120 },
             { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'description', headerText: 'Descricao', width: 280 }
+            { field: 'description', headerText: 'Descrição', width: 280 },
+            { field: 'active_label', headerText: 'Ativo', width: 110 }
           ]
         };
       case 'masterUsers':
@@ -223,8 +240,10 @@ export class AdminResourcePageComponent {
           columns: [
             { field: 'name', headerText: 'Nome', width: 220 },
             { field: 'login', headerText: 'Login', width: 150 },
-            { field: 'email', headerText: 'Email', width: 220 },
-            { field: 'role', headerText: 'Perfil', width: 120 }
+            { field: 'email', headerText: 'E-mail', width: 220 },
+            { field: 'role_label', headerText: 'Perfil', width: 140 },
+            { field: 'phone', headerText: 'Telefone', width: 150 },
+            { field: 'active_label', headerText: 'Ativo', width: 110 }
           ]
         };
       case 'accountModules':
@@ -237,9 +256,9 @@ export class AdminResourcePageComponent {
           supportsPaging: true,
           columns: [
             { field: 'account_name', headerText: 'Conta', width: 220 },
-            { field: 'module_code', headerText: 'Modulo', width: 140 },
-            { field: 'module_name', headerText: 'Nome do modulo', width: 220 },
-            { field: 'active', headerText: 'Ativo', width: 90 }
+            { field: 'module_code', headerText: 'Módulo', width: 140 },
+            { field: 'module_name', headerText: 'Nome do módulo', width: 220 },
+            { field: 'active_label', headerText: 'Ativo', width: 110 }
           ]
         };
       default:
@@ -257,10 +276,15 @@ export class AdminResourcePageComponent {
 
   private loadSupportOptions(token: string): void {
     this.supportOptionsLoaded = true;
+
     if (this.resource === 'accounts' || this.resource === 'accountModules') {
       this.adminDataService.plans(token).subscribe({
         next: (response) => {
           this.planOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: item.name }));
+          if (this.resource === 'accounts' && this.rows.length) {
+            this.filteredRows = this.mapRowsForDisplay(this.rows);
+            this.cdr.detectChanges();
+          }
         }
       });
     }
@@ -269,11 +293,19 @@ export class AdminResourcePageComponent {
       this.adminDataService.accounts(token).subscribe({
         next: (response) => {
           this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} - ${item.name}` }));
+          if (this.rows.length) {
+            this.filteredRows = this.mapRowsForDisplay(this.rows);
+            this.cdr.detectChanges();
+          }
         }
       });
       this.adminDataService.modules(token).subscribe({
         next: (response) => {
           this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} - ${item.name}` }));
+          if (this.rows.length) {
+            this.filteredRows = this.mapRowsForDisplay(this.rows);
+            this.cdr.detectChanges();
+          }
         }
       });
     }
@@ -299,6 +331,7 @@ export class AdminResourcePageComponent {
     }
 
     this.loading = true;
+    this.placeholder = false;
     this.persistState();
     const config = this.resourceConfig(token);
     const requestParams = config.supportsPaging === false
@@ -310,9 +343,13 @@ export class AdminResourcePageComponent {
           limit: this.pageSize,
           offset: this.offset
         };
+
     config
       .list(requestParams)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }))
       .subscribe({
         next: (response) => {
           if (!response?.status) {
@@ -322,29 +359,145 @@ export class AdminResourcePageComponent {
             this.filteredRows = [];
             this.totalItems = 0;
             this.hasNext = false;
+            this.returnedCount = 0;
+            this.cdr.detectChanges();
             return;
           }
 
           const payload = response.data as AdminPagedResponse<any> | any[];
           this.rows = this.extractItems(payload);
-          this.filteredRows = [...this.rows];
+          this.filteredRows = this.mapRowsForDisplay(this.rows);
           const pagination = !Array.isArray(payload) ? payload?.pagination : null;
           this.returnedCount = pagination?.returned ?? this.rows.length;
           this.totalItems = pagination?.total ?? this.rows.length;
           this.hasNext = pagination?.has_next ?? false;
           this.currentPage = Math.floor(this.offset / this.pageSize) + 1;
+
           if (config.supportsPaging === false) {
             this.returnedCount = this.rows.length;
             this.totalItems = this.rows.length;
             this.hasNext = false;
             this.currentPage = 1;
           }
+
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.placeholder = true;
           this.placeholderMessage = error?.error?.message || 'Falha ao carregar dados administrativos.';
+          this.rows = [];
+          this.filteredRows = [];
+          this.cdr.detectChanges();
         }
       });
+  }
+
+  private mapRowsForDisplay(rows: any[]): any[] {
+    return rows.map((row) => {
+      if (this.resource === 'accounts') {
+        return {
+          ...row,
+          status_label: this.accountStatusLabel(row.status),
+          plan_name: this.planName(row.plan_id),
+          storage_limit_label: this.formatStorage(row.storage_limit_mb),
+          storage_used_label: this.formatStorage(row.storage_used_mb),
+          expiration_date_label: this.formatDate(row.expiration_date),
+          active_label: this.booleanLabel(row.active)
+        };
+      }
+
+      if (this.resource === 'plans') {
+        return {
+          ...row,
+          price_label: this.formatCurrency(row.price),
+          max_storage_label: this.formatStorage(row.max_storage_mb),
+          active_label: this.booleanLabel(row.active)
+        };
+      }
+
+      if (this.resource === 'modules') {
+        return {
+          ...row,
+          active_label: this.booleanLabel(row.active)
+        };
+      }
+
+      if (this.resource === 'masterUsers') {
+        return {
+          ...row,
+          role_label: this.roleLabel(row.role),
+          active_label: this.booleanLabel(row.active)
+        };
+      }
+
+      if (this.resource === 'accountModules') {
+        return {
+          ...row,
+          account_name: row.account_name || this.accountName(row.account_id),
+          module_name: row.module_name || this.moduleName(row.module_code),
+          active_label: this.booleanLabel(row.active)
+        };
+      }
+
+      return row;
+    });
+  }
+
+  private formatCurrency(value: any): string {
+    const number = Number(value ?? 0);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+  }
+
+  private formatDate(value: any): string {
+    if (!value) {
+      return '-';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  }
+
+  private formatStorage(value: any): string {
+    const number = Number(value ?? 0);
+    return `${new Intl.NumberFormat('pt-BR').format(number)} MB`;
+  }
+
+  private booleanLabel(value: any): string {
+    return value ? 'Sim' : 'Não';
+  }
+
+  private roleLabel(value: any): string {
+    const role = String(value ?? '').toLowerCase();
+    if (role === 'admin') return 'Administrador';
+    if (role === 'manager') return 'Gestor';
+    if (role === 'support') return 'Suporte';
+    if (role === 'user') return 'Usuário';
+    return value ?? '-';
+  }
+
+  private accountStatusLabel(value: any): string {
+    const status = Number(value ?? 0);
+    if (status === 1) return 'Ativa';
+    if (status === 2) return 'Suspensa';
+    if (status === 3) return 'Bloqueada';
+    return String(value ?? '-');
+  }
+
+  private planName(planId: any): string {
+    const option = this.planOptions.find((item) => Number(item.id) === Number(planId));
+    return option?.text || `Plano ${planId ?? '-'}`;
+  }
+
+  private accountName(accountId: any): string {
+    const option = this.accountOptions.find((item) => Number(item.id) === Number(accountId));
+    return option?.text || `Conta ${accountId ?? '-'}`;
+  }
+
+  private moduleName(moduleCode: any): string {
+    const option = this.moduleOptions.find((item) => String(item.id) === String(moduleCode));
+    return option?.text?.split(' - ').slice(1).join(' - ') || `Módulo ${moduleCode ?? '-'}`;
   }
 
   openCreateDialog(): void {
@@ -392,7 +545,7 @@ export class AdminResourcePageComponent {
 
     const token = this.loginService.getToken();
     if (!token) {
-      this.dialogMessage = 'Sessao master nao encontrada.';
+      this.dialogMessage = 'Sessão master não encontrada.';
       return;
     }
 
@@ -415,7 +568,7 @@ export class AdminResourcePageComponent {
           this.loadPage();
         },
         error: (error) => {
-          this.dialogMessage = error?.error?.message || 'Nao foi possivel salvar o registro.';
+          this.dialogMessage = error?.error?.message || 'Não foi possível salvar o registro.';
           this.pushToast('error', 'Erro de operação', this.dialogMessage);
         }
       });
@@ -443,6 +596,7 @@ export class AdminResourcePageComponent {
             this.pushToast('error', 'Falha ao excluir', this.placeholderMessage);
             return;
           }
+
           this.pushToast('success', 'Registro removido', response.message || 'Exclusão realizada com sucesso.');
           if (this.rows.length === 1 && this.offset > 0) {
             this.offset = Math.max(0, this.offset - this.pageSize);
@@ -451,7 +605,7 @@ export class AdminResourcePageComponent {
         },
         error: (error) => {
           this.placeholder = true;
-          this.placeholderMessage = error?.error?.message || 'Nao foi possivel excluir o registro.';
+          this.placeholderMessage = error?.error?.message || 'Não foi possível excluir o registro.';
           this.pushToast('error', 'Erro de exclusão', this.placeholderMessage);
         }
       });
@@ -512,12 +666,12 @@ export class AdminResourcePageComponent {
 
   dialogTitle(): string {
     if (this.dialogMode === 'edit') {
-      return `Editar registro - ${this.title}`;
+      return `Editar registro · ${this.title}`;
     }
     if (this.dialogMode === 'duplicate') {
-      return `Duplicar registro - ${this.title}`;
+      return `Duplicar registro · ${this.title}`;
     }
-    return `Novo registro - ${this.title}`;
+    return `Novo registro · ${this.title}`;
   }
 
   canDelete(row: any): boolean {
@@ -550,15 +704,16 @@ export class AdminResourcePageComponent {
   }
 
   exportJson(): void {
-    this.downloadBlob('application/json', JSON.stringify(this.rows, null, 2), `${this.resource}-page-${this.currentPage}.json`);
+    this.downloadBlob('application/json', JSON.stringify(this.filteredRows, null, 2), `${this.resource}-page-${this.currentPage}.json`);
     this.pushToast('info', 'Exportação JSON', 'Página atual exportada com sucesso.');
   }
 
   exportCsv(): void {
-    const headers = this.columns.map((item) => item.field);
-    const rows = this.rows.map((row) =>
-      headers
-        .map((header) => `"${String(row?.[header] ?? '').replace(/"/g, '""')}"`)
+    const headers = this.columns.map((item) => item.headerText);
+    const fields = this.columns.map((item) => item.field);
+    const rows = this.filteredRows.map((row) =>
+      fields
+        .map((field) => `"${String(row?.[field] ?? '').replace(/"/g, '""')}"`)
         .join(',')
     );
     const csv = [headers.join(','), ...rows].join('\n');
@@ -572,6 +727,7 @@ export class AdminResourcePageComponent {
     if (!control) {
       return;
     }
+
     if (controlName === 'document') {
       const digits = value.replace(/\D/g, '').slice(0, 14);
       const masked = digits.length <= 11
@@ -579,6 +735,7 @@ export class AdminResourcePageComponent {
         : digits.replace(/^(\d{2})(\d)/, '$1.$2').replace(/^(\d{2}\.\d{3})(\d)/, '$1.$2').replace(/\.(\d{3})(\d)/, '.$1/$2').replace(/(\d{4})(\d{1,2})$/, '$1-$2');
       control.setValue(masked, { emitEvent: false });
     }
+
     if (controlName === 'phone') {
       const digits = value.replace(/\D/g, '').slice(0, 11);
       const masked = digits.replace(/^(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2');

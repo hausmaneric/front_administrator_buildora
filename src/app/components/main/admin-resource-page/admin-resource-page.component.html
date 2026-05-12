@@ -73,7 +73,7 @@
             </ejs-dropdownlist>
           </div>
           <div class="control-item">
-            <label>Pagina</label>
+            <label>Página</label>
             <ejs-dropdownlist
               [dataSource]="pageSizeOptions"
               [fields]="{ text: 'text', value: 'id' }"
@@ -84,20 +84,22 @@
         </div>
 
         @if (filteredRows.length) {
-          <ejs-grid [dataSource]="filteredRows" [allowResizing]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-            @for (column of columns; track column.field) {
-              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-            }
-            <e-column headerText="Ações" [width]="240">
-              <ng-template #template let-data>
-                <div class="row-actions">
-                  <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
-                  <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
-                  <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
-                </div>
-              </ng-template>
-            </e-column>
-          </ejs-grid>
+          <div class="grid-shell">
+            <ejs-grid [dataSource]="filteredRows" [allowResizing]="true" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
+              @for (column of columns; track column.field) {
+                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+              }
+              <e-column headerText="Ações" [width]="240">
+                <ng-template #template let-data>
+                  <div class="row-actions">
+                    <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
+                    <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
+                    <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
+                  </div>
+                </ng-template>
+              </e-column>
+            </ejs-grid>
+          </div>
 
           <div class="pager-bar">
             <button ejs-button cssClass="dialog-secondary" type="button" [disabled]="offset <= 0" (click)="previousPage()">Anterior</button>
@@ -161,7 +163,7 @@
               <ejs-textbox formControlName="phone" cssClass="orb-input" (input)="maskField('phone')"></ejs-textbox>
             </div>
             <div class="form-field">
-              <label>Email</label>
+              <label>E-mail</label>
               <ejs-textbox formControlName="email" cssClass="orb-input"></ejs-textbox>
               @if (fieldError('email')) { <small class="field-error">{{ fieldError('email') }}</small> }
             </div>
@@ -175,7 +177,7 @@
               @if (fieldError('database_url')) { <small class="field-error">{{ fieldError('database_url') }}</small> }
             </div>
             <div class="form-field">
-              <label>Storage limit MB</label>
+              <label>Limite de armazenamento (MB)</label>
               <ejs-textbox formControlName="storage_limit_mb" cssClass="orb-input"></ejs-textbox>
               @if (fieldError('storage_limit_mb')) { <small class="field-error">{{ fieldError('storage_limit_mb') }}</small> }
             </div>
@@ -205,7 +207,7 @@
             <div class="form-field"><label>Máx. empresas</label><ejs-textbox formControlName="max_companies" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_companies')) { <small class="field-error">{{ fieldError('max_companies') }}</small> }</div>
             <div class="form-field"><label>Máx. usuários</label><ejs-textbox formControlName="max_users" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_users')) { <small class="field-error">{{ fieldError('max_users') }}</small> }</div>
             <div class="form-field"><label>Máx. obras</label><ejs-textbox formControlName="max_works" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_works')) { <small class="field-error">{{ fieldError('max_works') }}</small> }</div>
-            <div class="form-field"><label>Storage MB</label><ejs-textbox formControlName="max_storage_mb" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_storage_mb')) { <small class="field-error">{{ fieldError('max_storage_mb') }}</small> }</div>
+            <div class="form-field"><label>Armazenamento (MB)</label><ejs-textbox formControlName="max_storage_mb" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_storage_mb')) { <small class="field-error">{{ fieldError('max_storage_mb') }}</small> }</div>
           </div>
         }
         @case ('modules') {
@@ -219,7 +221,7 @@
           <div class="form-grid two-cols">
             <div class="form-field"><label>Nome</label><ejs-textbox formControlName="name" cssClass="orb-input"></ejs-textbox>@if (fieldError('name')) { <small class="field-error">{{ fieldError('name') }}</small> }</div>
             <div class="form-field"><label>Login</label><ejs-textbox formControlName="login" cssClass="orb-input"></ejs-textbox>@if (fieldError('login')) { <small class="field-error">{{ fieldError('login') }}</small> }</div>
-            <div class="form-field"><label>Email</label><ejs-textbox formControlName="email" cssClass="orb-input"></ejs-textbox>@if (fieldError('email')) { <small class="field-error">{{ fieldError('email') }}</small> }</div>
+            <div class="form-field"><label>E-mail</label><ejs-textbox formControlName="email" cssClass="orb-input"></ejs-textbox>@if (fieldError('email')) { <small class="field-error">{{ fieldError('email') }}</small> }</div>
             <div class="form-field"><label>Senha</label><ejs-textbox formControlName="password" cssClass="orb-input"></ejs-textbox></div>
             <div class="form-field"><label>Telefone</label><ejs-textbox formControlName="phone" cssClass="orb-input"></ejs-textbox></div>
             <div class="form-field">

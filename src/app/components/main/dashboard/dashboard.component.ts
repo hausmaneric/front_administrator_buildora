@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { GridModule, SortService } from '@syncfusion/ej2-angular-grids';
 import { finalize } from 'rxjs';
 import { AdminDashboardViewModel, SummaryCard } from '../../../models/admin-dashboard';
@@ -43,7 +43,8 @@ export class DashboardComponent {
 
   constructor(
     private loginService: LoginService,
-    private dashboardService: AdminDashboardService
+    private dashboardService: AdminDashboardService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -51,18 +52,24 @@ export class DashboardComponent {
     if (!token) {
       this.errorMessage = 'Sessão master não encontrada.';
       this.loading = false;
+      this.cdr.detectChanges();
       return;
     }
 
     this.dashboardService
       .load(token)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.cdr.detectChanges();
+      }))
       .subscribe({
         next: (viewModel) => {
           this.viewModel = viewModel;
+          this.cdr.detectChanges();
         },
         error: (error) => {
           this.errorMessage = error?.error?.message || 'Falha ao carregar o dashboard administrativo.';
+          this.cdr.detectChanges();
         }
       });
   }
@@ -115,7 +122,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map(item => item.value), 1);
+    const max = Math.max(...points.map((item) => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     const line = points
@@ -137,7 +144,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map(item => item.value), 1);
+    const max = Math.max(...points.map((item) => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     return points

@@ -147,6 +147,17 @@
   overflow: hidden;
 }
 
+.grid-shell {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+}
+
+:host ::ng-deep .grid-shell .e-grid {
+  min-width: 1460px;
+}
+
 .loading-state,
 .placeholder-state {
   min-height: 220px;
