@@ -111,10 +111,91 @@ a {
   background: rgba(59, 130, 246, 0.08) !important;
 }
 
+.e-grid .e-selectionbackground,
+.e-grid .e-active .e-rowcell,
+.e-grid .e-rowcell.e-selectionbackground {
+  background: rgba(47, 111, 255, 0.12) !important;
+  color: var(--orbax-text) !important;
+}
+
+.e-grid .e-rowcell {
+  color: rgba(239, 246, 255, 0.92) !important;
+}
+
 .e-toolbar,
 .e-toolbar .e-toolbar-items,
 .e-treeview,
 .e-input-group,
 .e-control-wrapper {
   background: transparent !important;
+}
+
+.e-input-group,
+.e-control-wrapper.e-input-group,
+.e-ddl.e-input-group,
+.e-input-group input,
+.e-input-group textarea,
+.e-dropdownlist,
+.e-ddl .e-input,
+.e-ddl .e-input-value,
+.e-float-input input {
+  background: rgba(9, 24, 44, 0.92) !important;
+  color: var(--orbax-text) !important;
+  border-color: rgba(147, 197, 253, 0.18) !important;
+}
+
+.e-input-group-icon,
+.e-ddl .e-input-group-icon,
+.e-ddl .e-ddl-icon {
+  color: var(--orbax-text-soft) !important;
+}
+
+.e-input::placeholder,
+.e-input-group input::placeholder {
+  color: rgba(159, 179, 204, 0.72) !important;
+}
+
+.e-popup,
+.e-ddl.e-popup,
+.e-dropdown-popup,
+.e-list-parent,
+.e-list-item {
+  background: #0d2341 !important;
+  color: var(--orbax-text) !important;
+  border-color: rgba(147, 197, 253, 0.12) !important;
+}
+
+.e-list-item:hover,
+.e-list-item.e-active,
+.e-list-item.e-item-focus {
+  background: rgba(47, 111, 255, 0.18) !important;
+  color: white !important;
+}
+
+.e-btn,
+.e-css.e-btn {
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.e-btn.dialog-secondary {
+  background: rgba(14, 35, 65, 0.96) !important;
+  border: 1px solid rgba(147, 197, 253, 0.16) !important;
+  color: var(--orbax-text) !important;
+}
+
+.e-btn.dialog-primary,
+.e-btn.primary-action {
+  background: linear-gradient(135deg, #2f6fff 0%, #6aa3ff 100%) !important;
+  border: 1px solid rgba(120, 167, 255, 0.4) !important;
+  color: #fff !important;
+}
+
+.e-dialog,
+.e-dialog .e-dlg-content,
+.e-dialog .e-footer-content,
+.e-dialog .e-dlg-header-content {
+  background: #0d2341 !important;
+  color: var(--orbax-text) !important;
+  border-color: rgba(147, 197, 253, 0.12) !important;
 }

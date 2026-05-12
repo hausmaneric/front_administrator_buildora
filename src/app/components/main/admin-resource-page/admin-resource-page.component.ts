@@ -61,6 +61,7 @@ export class AdminResourcePageComponent {
   planOptions: any[] = [];
   accountOptions: any[] = [];
   moduleOptions: any[] = [];
+  supportOptionsLoaded = false;
   toasts: Array<{ id: number; type: 'success' | 'error' | 'info'; title: string; message: string }> = [];
   roleOptions = [
     { id: 'admin', text: 'Administrador' },
@@ -115,7 +116,6 @@ export class AdminResourcePageComponent {
     }));
 
     this.restoreState(config.sortField);
-    this.loadSupportOptions(token);
     this.loadPage();
   }
 
@@ -255,6 +255,7 @@ export class AdminResourcePageComponent {
   }
 
   private loadSupportOptions(token: string): void {
+    this.supportOptionsLoaded = true;
     if (this.resource === 'accounts' || this.resource === 'accountModules') {
       this.adminDataService.plans(token).subscribe({
         next: (response) => {
@@ -275,6 +276,19 @@ export class AdminResourcePageComponent {
         }
       });
     }
+  }
+
+  private ensureSupportOptionsLoaded(): void {
+    if (this.supportOptionsLoaded) {
+      return;
+    }
+
+    const token = this.loginService.getToken();
+    if (!token) {
+      return;
+    }
+
+    this.loadSupportOptions(token);
   }
 
   private loadPage(): void {
@@ -323,6 +337,7 @@ export class AdminResourcePageComponent {
   }
 
   openCreateDialog(): void {
+    this.ensureSupportOptionsLoaded();
     this.dialogMode = 'create';
     this.editingRow = null;
     this.createForm = this.buildForm();
@@ -331,6 +346,7 @@ export class AdminResourcePageComponent {
   }
 
   openEditDialog(row: any): void {
+    this.ensureSupportOptionsLoaded();
     this.dialogMode = 'edit';
     this.editingRow = row;
     this.createForm = this.buildForm();
@@ -344,6 +360,7 @@ export class AdminResourcePageComponent {
   }
 
   openDuplicateDialog(row: any): void {
+    this.ensureSupportOptionsLoaded();
     this.dialogMode = 'duplicate';
     this.editingRow = row;
     this.createForm = this.buildForm();

@@ -25,6 +25,11 @@
 
   @if (loading) {
     <article class="resource-body orb-card loading-state">
+      <div class="loading-skeleton">
+        <span class="skeleton-line w-40"></span>
+        <span class="skeleton-line w-70"></span>
+        <span class="skeleton-line w-55"></span>
+      </div>
       <strong>Carregando {{ title.toLowerCase() }}...</strong>
     </article>
   } @else if (placeholder) {
