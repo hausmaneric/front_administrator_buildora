@@ -1,6 +1,6 @@
-# Obrax Administração
+# Obrax Administracao
 
-Painel administrativo Angular da plataforma Obrax, baseado no padrão estrutural do `quartzo`, usando Syncfusion e integrado à API já publicada no Railway.
+Painel administrativo Angular da plataforma Obrax, baseado no padrao estrutural do `quartzo`, usando Syncfusion e integrado a API publicada no Railway.
 
 ## Stack
 
@@ -14,20 +14,20 @@ Painel administrativo Angular da plataforma Obrax, baseado no padrão estrutural
 
 - login master
 - dashboard administrativo
-- gestão de contas
-- gestão de planos
-- gestão de módulos
-- gestão de usuários master
-- vínculo de módulos por conta
+- gestao de contas
+- gestao de planos
+- gestao de modulos
+- gestao de usuarios master
+- vinculo de modulos por conta
 - onboarding e bootstrap de tenant
 - leitura de environment, ready, routes, catalog, security-check, schema e migrations
-- paginação server-side
-- busca e ordenação persistidas por módulo
-- ações por linha:
+- paginacao server-side
+- busca e ordenacao persistidas por modulo
+- acoes por linha:
   - editar
   - duplicar
   - remover
-- exportação da página atual:
+- exportacao da pagina atual:
   - CSV
   - JSON
 
@@ -44,22 +44,28 @@ npm run start
 npm run build
 ```
 
-Saída de build:
+Saida de build:
 
 - `dist/obrax-administracao/browser`
 
-## Deploy no Vercel
+## Deploy no Railway
 
-O projeto já está preparado com:
+O projeto esta preparado para deploy no Railway com:
 
-- `vercel.json`
-- `buildCommand`: `npm run build`
-- `outputDirectory`: `dist/obrax-administracao/browser`
-- rewrite SPA para `index.html`
+- `Dockerfile` multi-stage para build Angular
+- `nginx.conf.template` com fallback SPA
+- suporte ao `PORT` do Railway via `envsubst`
 
-Ao importar este repositório no Vercel, ele deve funcionar sem ajustes extras.
+Fluxo recomendado:
 
-## Observações
+1. subir o repositorio `front_administrator_buildora` no GitHub
+2. no Railway, criar `New Project`
+3. escolher `Deploy from GitHub repo`
+4. selecionar o repositorio do administrativo
+5. apos o deploy, abrir `Settings -> Networking`
+6. clicar em `Generate Domain`
 
-- a pasta `quartzo/` foi mantida apenas como referência local e está ignorada para publicação
-- o front já aponta para a API produtiva do Railway em `src/app/resources.ts`
+## Observacoes
+
+- a pasta `quartzo/` foi mantida apenas como referencia local e esta ignorada para publicacao
+- o front ja aponta para a API produtiva do Railway em `src/app/resources.ts`
