@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { AdminAccount, AdminAccountModule, AdminMasterUser, AdminModule, AdminPagedResponse, AdminPlan } from '../models/admin-resource';
 import { NxResult } from '../models/login';
 import * as resources from '../resources';
@@ -30,7 +30,12 @@ export class AdminDataService {
       return cached as Observable<T>;
     }
 
-    const request$ = this.http.get<T>(url).pipe(shareReplay(1));
+    const request$ = this.http.get<T>(url).pipe(
+      tap({
+        error: () => this.getCache.delete(url)
+      }),
+      shareReplay(1)
+    );
     this.getCache.set(url, request$);
     return request$;
   }
@@ -45,7 +50,8 @@ export class AdminDataService {
   }
 
   accounts(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>> {
-    return this.cachedGet<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>>(`${resources.apiURL}admin/accounts/${token}${this.queryParams(params)}`);
+    const url = `${resources.apiURL}admin/accounts/${token}${this.queryParams(params)}`;
+    return Object.keys(params).length ? this.http.get<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>>(url) : this.cachedGet<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>>(url);
   }
 
   createAccount(token: string, payload: Partial<AdminAccount> & Record<string, any>): Observable<NxResult<any>> {
@@ -64,7 +70,8 @@ export class AdminDataService {
   }
 
   plans(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminPlan[] | AdminPagedResponse<AdminPlan>>> {
-    return this.cachedGet<NxResult<AdminPlan[] | AdminPagedResponse<AdminPlan>>>(`${resources.apiURL}admin/plans/${token}${this.queryParams(params)}`);
+    const url = `${resources.apiURL}admin/plans/${token}${this.queryParams(params)}`;
+    return Object.keys(params).length ? this.http.get<NxResult<AdminPlan[] | AdminPagedResponse<AdminPlan>>>(url) : this.cachedGet<NxResult<AdminPlan[] | AdminPagedResponse<AdminPlan>>>(url);
   }
 
   createPlan(token: string, payload: Partial<AdminPlan> & Record<string, any>): Observable<NxResult<any>> {
@@ -83,7 +90,8 @@ export class AdminDataService {
   }
 
   modules(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminModule[] | AdminPagedResponse<AdminModule>>> {
-    return this.cachedGet<NxResult<AdminModule[] | AdminPagedResponse<AdminModule>>>(`${resources.apiURL}admin/modules/${token}${this.queryParams(params)}`);
+    const url = `${resources.apiURL}admin/modules/${token}${this.queryParams(params)}`;
+    return Object.keys(params).length ? this.http.get<NxResult<AdminModule[] | AdminPagedResponse<AdminModule>>>(url) : this.cachedGet<NxResult<AdminModule[] | AdminPagedResponse<AdminModule>>>(url);
   }
 
   createModule(token: string, payload: Partial<AdminModule> & Record<string, any>): Observable<NxResult<any>> {
@@ -102,7 +110,8 @@ export class AdminDataService {
   }
 
   masterUsers(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminMasterUser[] | AdminPagedResponse<AdminMasterUser>>> {
-    return this.cachedGet<NxResult<AdminMasterUser[] | AdminPagedResponse<AdminMasterUser>>>(`${resources.apiURL}admin/master_users/${token}${this.queryParams(params)}`);
+    const url = `${resources.apiURL}admin/master_users/${token}${this.queryParams(params)}`;
+    return Object.keys(params).length ? this.http.get<NxResult<AdminMasterUser[] | AdminPagedResponse<AdminMasterUser>>>(url) : this.cachedGet<NxResult<AdminMasterUser[] | AdminPagedResponse<AdminMasterUser>>>(url);
   }
 
   createMasterUser(token: string, payload: Partial<AdminMasterUser> & Record<string, any>): Observable<NxResult<any>> {
@@ -121,7 +130,8 @@ export class AdminDataService {
   }
 
   accountModules(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminAccountModule[] | AdminPagedResponse<AdminAccountModule>>> {
-    return this.cachedGet<NxResult<AdminAccountModule[] | AdminPagedResponse<AdminAccountModule>>>(`${resources.apiURL}admin/account_modules/${token}${this.queryParams(params)}`);
+    const url = `${resources.apiURL}admin/account_modules/${token}${this.queryParams(params)}`;
+    return Object.keys(params).length ? this.http.get<NxResult<AdminAccountModule[] | AdminPagedResponse<AdminAccountModule>>>(url) : this.cachedGet<NxResult<AdminAccountModule[] | AdminPagedResponse<AdminAccountModule>>>(url);
   }
 
   createAccountModule(token: string, payload: Record<string, any>): Observable<NxResult<any>> {

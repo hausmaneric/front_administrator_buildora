@@ -10,6 +10,13 @@ import { AdminDataService } from './admin-data.service';
 export class AdminDashboardService {
   constructor(private adminDataService: AdminDataService) {}
 
+  private ensureSuccess(response: any, label: string): any {
+    if (!response?.status) {
+      throw new Error(response?.message || `Falha ao carregar ${label}.`);
+    }
+    return response;
+  }
+
   private safeData<T>(response: any): T[] | AdminPagedResponse<T> {
     if (!response?.status) {
       return [] as T[];
@@ -26,19 +33,24 @@ export class AdminDashboardService {
 
   load(token: string): Observable<AdminDashboardViewModel> {
     return forkJoin({
-      accounts: this.adminDataService.accounts(token).pipe(catchError(() => of({ status: false, data: [] }))),
-      plans: this.adminDataService.plans(token).pipe(catchError(() => of({ status: false, data: [] }))),
-      modules: this.adminDataService.modules(token).pipe(catchError(() => of({ status: false, data: [] }))),
-      masterUsers: this.adminDataService.masterUsers(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      accounts: this.adminDataService.accounts(token),
+      plans: this.adminDataService.plans(token),
+      modules: this.adminDataService.modules(token),
+      masterUsers: this.adminDataService.masterUsers(token),
       accountModules: this.adminDataService.accountModules(token).pipe(catchError(() => of({ status: false, data: [] }))),
       environment: this.adminDataService.environment().pipe(catchError(() => of({ status: false, data: {} }))),
       ready: this.adminDataService.ready().pipe(catchError(() => of({ status: false, data: {} })))
     }).pipe(
       map(({ accounts, plans, modules, masterUsers, accountModules, environment, ready }) => {
-        const accountRows = this.extractItems<AdminAccount>(this.safeData<AdminAccount>(accounts));
-        const planRows = this.extractItems<AdminPlan>(this.safeData<AdminPlan>(plans));
-        const moduleRows = this.extractItems<AdminModule>(this.safeData<AdminModule>(modules));
-        const masterUserRows = this.extractItems<AdminMasterUser>(this.safeData<AdminMasterUser>(masterUsers));
+        const safeAccounts = this.ensureSuccess(accounts, 'contas');
+        const safePlans = this.ensureSuccess(plans, 'planos');
+        const safeModules = this.ensureSuccess(modules, 'modulos');
+        const safeMasterUsers = this.ensureSuccess(masterUsers, 'usuarios master');
+
+        const accountRows = this.extractItems<AdminAccount>(this.safeData<AdminAccount>(safeAccounts));
+        const planRows = this.extractItems<AdminPlan>(this.safeData<AdminPlan>(safePlans));
+        const moduleRows = this.extractItems<AdminModule>(this.safeData<AdminModule>(safeModules));
+        const masterUserRows = this.extractItems<AdminMasterUser>(this.safeData<AdminMasterUser>(safeMasterUsers));
         const accountModuleRows = this.extractItems(this.safeData(accountModules));
 
         const activeAccounts = accountRows.filter((item: AdminAccount) => item.active === true);
