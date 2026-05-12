@@ -315,6 +315,16 @@ export class AdminResourcePageComponent {
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
         next: (response) => {
+          if (!response?.status) {
+            this.placeholder = true;
+            this.placeholderMessage = response?.message || 'Falha ao carregar dados administrativos.';
+            this.rows = [];
+            this.filteredRows = [];
+            this.totalItems = 0;
+            this.hasNext = false;
+            return;
+          }
+
           const payload = response.data as AdminPagedResponse<any> | any[];
           this.rows = this.extractItems(payload);
           this.filteredRows = [...this.rows];

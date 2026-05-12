@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { forkJoin, map, Observable } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { AdminDashboardViewModel, AlertRow, DistributionItem, LogRow, SummaryCard, TrendPoint } from '../models/admin-dashboard';
 import { AdminAccount, AdminMasterUser, AdminModule, AdminPagedResponse, AdminPlan } from '../models/admin-resource';
 import { AdminDataService } from './admin-data.service';
@@ -10,6 +10,13 @@ import { AdminDataService } from './admin-data.service';
 export class AdminDashboardService {
   constructor(private adminDataService: AdminDataService) {}
 
+  private safeData<T>(response: any): T[] | AdminPagedResponse<T> {
+    if (!response?.status) {
+      return [] as T[];
+    }
+    return (response.data ?? []) as T[] | AdminPagedResponse<T>;
+  }
+
   private extractItems<T>(data: T[] | AdminPagedResponse<T> | null | undefined): T[] {
     if (!data) {
       return [];
@@ -19,20 +26,20 @@ export class AdminDashboardService {
 
   load(token: string): Observable<AdminDashboardViewModel> {
     return forkJoin({
-      accounts: this.adminDataService.accounts(token),
-      plans: this.adminDataService.plans(token),
-      modules: this.adminDataService.modules(token),
-      masterUsers: this.adminDataService.masterUsers(token),
-      accountModules: this.adminDataService.accountModules(token),
-      environment: this.adminDataService.environment(),
-      ready: this.adminDataService.ready()
+      accounts: this.adminDataService.accounts(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      plans: this.adminDataService.plans(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      modules: this.adminDataService.modules(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      masterUsers: this.adminDataService.masterUsers(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      accountModules: this.adminDataService.accountModules(token).pipe(catchError(() => of({ status: false, data: [] }))),
+      environment: this.adminDataService.environment().pipe(catchError(() => of({ status: false, data: {} }))),
+      ready: this.adminDataService.ready().pipe(catchError(() => of({ status: false, data: {} })))
     }).pipe(
       map(({ accounts, plans, modules, masterUsers, accountModules, environment, ready }) => {
-        const accountRows = this.extractItems(accounts.data);
-        const planRows = this.extractItems(plans.data);
-        const moduleRows = this.extractItems(modules.data);
-        const masterUserRows = this.extractItems(masterUsers.data);
-        const accountModuleRows = this.extractItems(accountModules.data);
+        const accountRows = this.extractItems<AdminAccount>(this.safeData<AdminAccount>(accounts));
+        const planRows = this.extractItems<AdminPlan>(this.safeData<AdminPlan>(plans));
+        const moduleRows = this.extractItems<AdminModule>(this.safeData<AdminModule>(modules));
+        const masterUserRows = this.extractItems<AdminMasterUser>(this.safeData<AdminMasterUser>(masterUsers));
+        const accountModuleRows = this.extractItems(this.safeData(accountModules));
 
         const activeAccounts = accountRows.filter((item: AdminAccount) => item.active === true);
         const totalStorageMb = activeAccounts.reduce((sum: number, item: AdminAccount) => sum + Number(item.storage_limit_mb || 0), 0);
@@ -55,7 +62,7 @@ export class AdminDashboardService {
           subscriptionDistribution: this.subscriptionDistribution(activeAccounts),
           storageTrend: this.storageTrend(usedStorageMb),
           recentAccess: this.recentAccess(activeAccounts),
-          recentLogs: this.recentLogs(moduleRows, ready.data, environment.data),
+          recentLogs: this.recentLogs(moduleRows, ready?.data ?? {}, environment?.data ?? {}),
           alerts: this.alerts(activeAccounts, storagePercent || accountModuleRows.length),
           footerStats: cards,
         };

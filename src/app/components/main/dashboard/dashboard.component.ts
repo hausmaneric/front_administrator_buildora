@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { GridModule, SortService } from '@syncfusion/ej2-angular-grids';
 import { finalize } from 'rxjs';
 import { AdminDashboardViewModel, SummaryCard } from '../../../models/admin-dashboard';
 import { AdminDashboardService } from '../../../services/admin-dashboard.service';
@@ -10,6 +10,7 @@ import { LoginService } from '../../../services/login.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, GridModule],
+  providers: [SortService],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
