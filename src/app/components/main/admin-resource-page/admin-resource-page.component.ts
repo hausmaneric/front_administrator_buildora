@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute } from '@angular/router';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogComponent, DialogModule } from '@syncfusion/ej2-angular-popups';
 import { finalize, Observable } from 'rxjs';
@@ -28,6 +28,7 @@ type ResourceConfig = {
   selector: 'app-admin-resource-page',
   standalone: true,
   imports: [CommonModule, GridModule, ReactiveFormsModule, TextBoxModule, DialogModule, ButtonModule, DropDownListModule, CheckBoxModule],
+  providers: [ResizeService, SortService],
   templateUrl: './admin-resource-page.component.html',
   styleUrl: './admin-resource-page.component.scss'
 })
@@ -171,7 +172,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createAccount(token, payload),
           update: (payload) => this.adminDataService.updateAccount(token, payload),
           remove: (id) => this.adminDataService.deleteAccount(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: true,
           columns: [
             { field: 'code', headerText: 'Codigo', width: 110 },
@@ -187,7 +188,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createPlan(token, payload),
           update: (payload) => this.adminDataService.updatePlan(token, payload),
           remove: (id) => this.adminDataService.deletePlan(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
@@ -203,7 +204,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createModule(token, payload),
           update: (payload) => this.adminDataService.updateModule(token, payload),
           remove: (id) => this.adminDataService.deleteModule(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: true,
           columns: [
             { field: 'code', headerText: 'Codigo', width: 120 },
@@ -217,7 +218,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createMasterUser(token, payload),
           update: (payload) => this.adminDataService.updateMasterUser(token, payload),
           remove: (id) => this.adminDataService.deleteMasterUser(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: false,
           columns: [
             { field: 'name', headerText: 'Nome', width: 220 },
@@ -232,7 +233,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createAccountModule(token, payload),
           update: (payload) => this.adminDataService.updateAccountModule(token, payload),
           remove: (id) => this.adminDataService.deleteAccountModule(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: true,
           columns: [
             { field: 'account_name', headerText: 'Conta', width: 220 },
@@ -247,7 +248,7 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createAccount(token, payload),
           update: (payload) => this.adminDataService.updateAccount(token, payload),
           remove: (id) => this.adminDataService.deleteAccount(token, id),
-          sortField: 'created_at',
+          sortField: 'id',
           supportsPaging: true,
           columns: []
         };
