@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { GridModule } from '@syncfusion/ej2-angular-grids';
+import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { finalize, forkJoin, Observable } from 'rxjs';
+import { Observable, finalize, forkJoin } from 'rxjs';
 import { AdminDataService } from '../../../services/admin-data.service';
 import { LoginService } from '../../../services/login.service';
 
@@ -12,6 +12,7 @@ import { LoginService } from '../../../services/login.service';
   selector: 'app-admin-ops-page',
   standalone: true,
   imports: [CommonModule, GridModule, ButtonModule, TextBoxModule],
+  providers: [ResizeService, SortService],
   templateUrl: './admin-ops-page.component.html',
   styleUrl: './admin-ops-page.component.scss'
 })
@@ -32,14 +33,24 @@ export class AdminOpsPageComponent {
   constructor(
     private route: ActivatedRoute,
     private loginService: LoginService,
-    private adminDataService: AdminDataService
+    private adminDataService: AdminDataService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.title = this.route.snapshot.data['title'] ?? 'Controle';
-    this.subtitle = this.route.snapshot.data['subtitle'] ?? '';
-    this.resource = this.route.snapshot.data['resource'] ?? '';
-    this.load();
+    this.route.data.subscribe((data) => {
+      this.title = data['title'] ?? 'Controle';
+      this.subtitle = data['subtitle'] ?? '';
+      this.resource = data['resource'] ?? '';
+      this.load();
+    });
+  }
+
+  private flushView(): void {
+    queueMicrotask(() => {
+      window.dispatchEvent(new Event('resize'));
+      this.cdr.detectChanges();
+    });
   }
 
   load(): void {
@@ -47,6 +58,7 @@ export class AdminOpsPageComponent {
     if (!token) {
       this.errorMessage = 'Sessão master não encontrada.';
       this.loading = false;
+      this.flushView();
       return;
     }
 
@@ -54,11 +66,15 @@ export class AdminOpsPageComponent {
     this.errorMessage = '';
 
     this.requestFor(this.resource, token)
-      .pipe(finalize(() => (this.loading = false)))
+      .pipe(finalize(() => {
+        this.loading = false;
+        this.flushView();
+      }))
       .subscribe({
-        next: (payload: any) => this.mapPayload(payload),
-        error: (error: any) => {
+        next: (payload) => this.mapPayload(payload),
+        error: (error) => {
           this.errorMessage = error?.error?.message || 'Falha ao carregar dados operacionais.';
+          this.flushView();
         }
       });
   }
@@ -70,17 +86,20 @@ export class AdminOpsPageComponent {
     }
 
     this.actionLoading = true;
-    const request$ =
-      action === 'migrations'
-        ? this.adminDataService.applyMigrations(token)
-        : this.adminDataService.bootstrapMaster(token, {});
+    const request$ = action === 'migrations'
+      ? this.adminDataService.applyMigrations(token)
+      : this.adminDataService.bootstrapMaster(token, {});
 
     request$
-      .pipe(finalize(() => (this.actionLoading = false)))
+      .pipe(finalize(() => {
+        this.actionLoading = false;
+        this.flushView();
+      }))
       .subscribe({
         next: () => this.load(),
         error: (error) => {
-          this.errorMessage = error?.error?.message || 'Falha ao executar ação administrativa.';
+          this.errorMessage = error?.error?.message || 'Falha ao executar a ação administrativa.';
+          this.flushView();
         }
       });
   }
@@ -88,7 +107,6 @@ export class AdminOpsPageComponent {
   private requestFor(resource: string, token: string): Observable<any> {
     switch (resource) {
       case 'subscriptions':
-        return this.adminDataService.accounts(token);
       case 'storage':
         return this.adminDataService.accounts(token);
       case 'logs':
@@ -169,6 +187,8 @@ export class AdminOpsPageComponent {
         this.mapSettings(payload);
         break;
     }
+
+    this.flushView();
   }
 
   onSearch(term: string): void {
@@ -183,19 +203,19 @@ export class AdminOpsPageComponent {
   }
 
   private mapSubscriptions(accounts: any[]): void {
-    const now = new Date().getTime();
-    const expiring = accounts.filter(item => {
+    const now = Date.now();
+    const expiring = accounts.filter((item) => {
       const diff = new Date(item.expiration_date).getTime() - now;
       return diff > 0 && diff <= 7 * 24 * 60 * 60 * 1000;
     }).length;
-    const expired = accounts.filter(item => new Date(item.expiration_date).getTime() < now).length;
+    const expired = accounts.filter((item) => new Date(item.expiration_date).getTime() < now).length;
 
     this.cards = [
-      { label: 'Contas ativas', value: `${accounts.filter(item => item.active).length}`, detail: 'Assinaturas habilitadas' },
+      { label: 'Contas ativas', value: `${accounts.filter((item) => item.active).length}`, detail: 'Assinaturas habilitadas' },
       { label: 'Vencendo', value: `${expiring}`, detail: 'Nos próximos 7 dias', tone: 'warning' },
       { label: 'Vencidas', value: `${expired}`, detail: 'Exigem ação imediata', tone: 'danger' }
     ];
-    this.rows = accounts.map(item => ({
+    this.rows = accounts.map((item) => ({
       name: item.name,
       code: item.code,
       email: item.email,
@@ -203,10 +223,10 @@ export class AdminOpsPageComponent {
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'name', headerText: 'Conta', width: 240 },
-      { field: 'code', headerText: 'Código', width: 140 },
-      { field: 'email', headerText: 'E-mail', width: 240 },
-      { field: 'expiration_date', headerText: 'Vencimento', width: 150 }
+      { field: 'name', headerText: 'Conta', width: 260 },
+      { field: 'code', headerText: 'Código', width: 150 },
+      { field: 'email', headerText: 'E-mail', width: 260 },
+      { field: 'expiration_date', headerText: 'Vencimento', width: 160 }
     ];
   }
 
@@ -220,7 +240,7 @@ export class AdminOpsPageComponent {
       { label: 'Armazenamento usado', value: this.formatStorage(used), detail: `${percent}% do total` },
       { label: 'Contas monitoradas', value: `${accounts.length}`, detail: 'Base master' }
     ];
-    this.rows = accounts.map(item => ({
+    this.rows = accounts.map((item) => ({
       name: item.name,
       code: item.code,
       storage_limit_mb: this.formatStorage(item.storage_limit_mb),
@@ -229,11 +249,11 @@ export class AdminOpsPageComponent {
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'name', headerText: 'Conta', width: 240 },
-      { field: 'code', headerText: 'Código', width: 140 },
-      { field: 'storage_limit_mb', headerText: 'Limite', width: 160 },
-      { field: 'storage_used_mb', headerText: 'Uso atual', width: 160 },
-      { field: 'usage_percent', headerText: 'Uso', width: 100 }
+      { field: 'name', headerText: 'Conta', width: 260 },
+      { field: 'code', headerText: 'Código', width: 150 },
+      { field: 'storage_limit_mb', headerText: 'Limite', width: 170 },
+      { field: 'storage_used_mb', headerText: 'Uso atual', width: 170 },
+      { field: 'usage_percent', headerText: 'Uso', width: 110 }
     ];
   }
 
@@ -250,9 +270,9 @@ export class AdminOpsPageComponent {
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'method', headerText: 'Métodos', width: 140 },
-      { field: 'path', headerText: 'Rota', width: 460 },
-      { field: 'requires_token', headerText: 'Exige token', width: 130 }
+      { field: 'method', headerText: 'Métodos', width: 160 },
+      { field: 'path', headerText: 'Rota', width: 520 },
+      { field: 'requires_token', headerText: 'Exige token', width: 140 }
     ];
   }
 
@@ -302,9 +322,9 @@ export class AdminOpsPageComponent {
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'file', headerText: 'Arquivo', width: 260 },
-      { field: 'version', headerText: 'Versão', width: 100 },
-      { field: 'applied', headerText: 'Aplicada', width: 100 },
+      { field: 'file', headerText: 'Arquivo', width: 270 },
+      { field: 'version', headerText: 'Versão', width: 120 },
+      { field: 'applied', headerText: 'Aplicada', width: 110 },
       { field: 'applied_at', headerText: 'Registro', width: 180 }
     ];
 
@@ -330,13 +350,7 @@ export class AdminOpsPageComponent {
     this.panels = [
       {
         title: 'Links úteis do backend',
-        lines: [
-          '/api/v1/routes',
-          '/api/v1/catalog',
-          '/api/v1/environment',
-          '/api/v1/security-check',
-          '/api/v1/smoke-plan'
-        ]
+        lines: ['/api/v1/routes', '/api/v1/catalog', '/api/v1/environment', '/api/v1/security-check', '/api/v1/smoke-plan']
       }
     ];
   }
@@ -361,9 +375,9 @@ export class AdminOpsPageComponent {
     this.applyFilter();
     this.columns = [
       { field: 'plan', headerText: 'Plano', width: 220 },
-      { field: 'price', headerText: 'Preço', width: 120 },
-      { field: 'max_users', headerText: 'Usuários', width: 110 },
-      { field: 'max_storage_mb', headerText: 'Armazenamento', width: 140 }
+      { field: 'price', headerText: 'Preço', width: 130 },
+      { field: 'max_users', headerText: 'Usuários', width: 120 },
+      { field: 'max_storage_mb', headerText: 'Armazenamento', width: 150 }
     ];
   }
 
@@ -392,10 +406,10 @@ export class AdminOpsPageComponent {
     });
     this.applyFilter();
     this.columns = [
-      { field: 'account', headerText: 'Conta', width: 220 },
-      { field: 'code', headerText: 'Código', width: 140 },
+      { field: 'account', headerText: 'Conta', width: 240 },
+      { field: 'code', headerText: 'Código', width: 150 },
       { field: 'plan', headerText: 'Plano', width: 180 },
-      { field: 'price', headerText: 'Preço', width: 120 }
+      { field: 'price', headerText: 'Preço', width: 130 }
     ];
   }
 
@@ -431,38 +445,25 @@ export class AdminOpsPageComponent {
     }
 
     this.filteredRows = this.rows.filter((row) =>
-      Object.values(row ?? {}).some((value) =>
-        String(value ?? '')
-          .toLowerCase()
-          .includes(term)
-      )
+      Object.values(row ?? {}).some((value) => String(value ?? '').toLowerCase().includes(term))
     );
   }
 
   private formatCurrency(value: any): string {
-    const number = Number(value ?? 0);
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value ?? 0));
   }
 
   private formatDate(value: any): string {
-    if (!value) {
-      return '-';
-    }
+    if (!value) return '-';
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return String(value);
-    }
+    if (Number.isNaN(date.getTime())) return String(value);
     return new Intl.DateTimeFormat('pt-BR').format(date);
   }
 
   private formatDateTime(value: any): string {
-    if (!value) {
-      return '-';
-    }
+    if (!value) return '-';
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return String(value);
-    }
+    if (Number.isNaN(date.getTime())) return String(value);
     return new Intl.DateTimeFormat('pt-BR', {
       day: '2-digit',
       month: '2-digit',

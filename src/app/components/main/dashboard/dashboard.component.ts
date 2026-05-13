@@ -32,15 +32,15 @@ export class DashboardComponent {
   accessColumns = [
     { field: 'company', headerText: 'Empresa', width: 220 },
     { field: 'user', headerText: 'Usuário', width: 220 },
-    { field: 'dateTime', headerText: 'Data e hora', width: 150 },
+    { field: 'dateTime', headerText: 'Data e hora', width: 160 },
     { field: 'ip', headerText: 'IP', width: 140 },
     { field: 'badge', headerText: 'Conta', width: 150 }
   ];
 
   logColumns = [
-    { field: 'title', headerText: 'Evento', width: 250 },
-    { field: 'dateTime', headerText: 'Data e hora', width: 150 },
-    { field: 'type', headerText: 'Categoria', width: 140 },
+    { field: 'title', headerText: 'Evento', width: 260 },
+    { field: 'dateTime', headerText: 'Data e hora', width: 160 },
+    { field: 'type', headerText: 'Categoria', width: 160 },
     { field: 'toneLabel', headerText: 'Prioridade', width: 140 }
   ];
 
@@ -60,8 +60,7 @@ export class DashboardComponent {
       return;
     }
 
-    this.dashboardService
-      .load(token)
+    this.dashboardService.load(token)
       .pipe(finalize(() => {
         this.loading = false;
         queueMicrotask(() => {
@@ -70,12 +69,12 @@ export class DashboardComponent {
         });
       }))
       .subscribe({
-        next: (viewModel) => {
+        next: viewModel => {
           this.viewModel = viewModel;
           this.cdr.detectChanges();
         },
-        error: (error) => {
-          this.errorMessage = error?.error?.message || 'Falha ao carregar o dashboard administrativo.';
+        error: error => {
+          this.errorMessage = error?.error?.message || error?.message || 'Falha ao carregar o dashboard administrativo.';
           this.cdr.detectChanges();
         }
       });
@@ -87,21 +86,20 @@ export class DashboardComponent {
 
   openSection(section: 'accounts' | 'logs' | 'storage'): void {
     if (section === 'accounts') {
-      this.router.navigate(['/main/accounts']);
+      void this.router.navigate(['/main/accounts']);
       return;
     }
     if (section === 'logs') {
-      this.router.navigate(['/main/logs']);
+      void this.router.navigate(['/main/logs']);
       return;
     }
-    this.router.navigate(['/main/storage']);
+    void this.router.navigate(['/main/storage']);
   }
 
   distributionPercent(total: number, value: number): string {
     if (!total) {
       return '0%';
     }
-
     return `${((value / total) * 100).toFixed(1).replace('.', ',')}%`;
   }
 
@@ -123,7 +121,7 @@ export class DashboardComponent {
   donutBackground(items: Array<{ color: string; value: number }>): string {
     const total = items.reduce((sum, item) => sum + item.value, 0) || 1;
     let start = 0;
-    const segments = items.map((item) => {
+    const segments = items.map(item => {
       const size = (item.value / total) * 100;
       const segment = `${item.color} ${start}% ${start + size}%`;
       start += size;
@@ -141,7 +139,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map((item) => item.value), 1);
+    const max = Math.max(...points.map(item => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     const line = points
@@ -163,7 +161,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map((item) => item.value), 1);
+    const max = Math.max(...points.map(item => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     return points

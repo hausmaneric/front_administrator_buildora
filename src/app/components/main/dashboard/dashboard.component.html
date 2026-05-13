@@ -109,9 +109,11 @@
           <button type="button" (click)="openSection('accounts')">Ver todos</button>
         </div>
         <ejs-grid [dataSource]="viewModel.recentAccess" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-          @for (column of accessColumns; track column.field) {
-            <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-          }
+          <e-columns>
+            @for (column of accessColumns; track column.field) {
+              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+            }
+          </e-columns>
         </ejs-grid>
       </article>
 
@@ -121,9 +123,11 @@
           <button type="button" (click)="openSection('logs')">Ver todos</button>
         </div>
         <ejs-grid [dataSource]="viewModel.recentLogs" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-          @for (column of logColumns; track column.field) {
-            <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-          }
+          <e-columns>
+            @for (column of logColumns; track column.field) {
+              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+            }
+          </e-columns>
         </ejs-grid>
       </article>
 
@@ -152,6 +156,5 @@
         </div>
       </article>
     </div>
-
   </section>
 }

@@ -7,15 +7,21 @@ import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogComponent, DialogModule } from '@syncfusion/ej2-angular-popups';
-import { finalize, Observable } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 import { AdminPagedResponse } from '../../../models/admin-resource';
 import { AdminDataService } from '../../../services/admin-data.service';
 import { LoginService } from '../../../services/login.service';
 
 type DialogMode = 'create' | 'edit' | 'duplicate';
 
+type ResourceColumn = {
+  field: string;
+  headerText: string;
+  width: number;
+};
+
 type ResourceConfig = {
-  columns: Array<{ field: string; headerText: string; width?: number }>;
+  columns: ResourceColumn[];
   sortField: string;
   supportsPaging?: boolean;
   list: (params: Record<string, any>) => Observable<any>;
@@ -40,7 +46,7 @@ export class AdminResourcePageComponent {
   resource = 'placeholder';
   rows: any[] = [];
   filteredRows: any[] = [];
-  columns: Array<{ field: string; headerText: string; width?: number }> = [];
+  columns: ResourceColumn[] = [];
   loading = true;
   saving = false;
   placeholder = false;
@@ -56,29 +62,34 @@ export class AdminResourcePageComponent {
   sortField = 'id';
   sortDirection: 'asc' | 'desc' = 'desc';
   hasNext = false;
-  returnedCount = 0;
   dialogMode: DialogMode = 'create';
   editingRow: any = null;
-  planOptions: any[] = [];
-  accountOptions: any[] = [];
-  moduleOptions: any[] = [];
+  planOptions: Array<{ id: number; text: string }> = [];
+  accountOptions: Array<{ id: number; text: string }> = [];
+  moduleOptions: Array<{ id: string; text: string }> = [];
   supportOptionsLoaded = false;
   toasts: Array<{ id: number; type: 'success' | 'error' | 'info'; title: string; message: string }> = [];
+
   roleOptions = [
     { id: 'admin', text: 'Administrador' },
     { id: 'manager', text: 'Gestor' },
     { id: 'support', text: 'Suporte' }
   ];
+
   pageSizeOptions = [
     { id: 10, text: '10 por página' },
     { id: 20, text: '20 por página' },
     { id: 50, text: '50 por página' }
   ];
+
   sortOptions: Array<{ id: string; text: string }> = [];
+
   sortDirectionOptions = [
     { id: 'desc', text: 'Decrescente' },
     { id: 'asc', text: 'Crescente' }
   ];
+
+  private toastSeed = 1;
 
   constructor(
     private route: ActivatedRoute,
@@ -88,16 +99,20 @@ export class AdminResourcePageComponent {
     private cdr: ChangeDetectorRef
   ) {}
 
-  private toastSeed = 1;
-
   ngOnInit(): void {
-    this.title = this.route.snapshot.data['title'] ?? 'Gestão';
-    this.subtitle = this.route.snapshot.data['subtitle'] ?? '';
-    this.resource = this.route.snapshot.data['resource'] ?? 'placeholder';
+    this.route.data.subscribe((data) => {
+      this.title = data['title'] ?? 'Gestão';
+      this.subtitle = data['subtitle'] ?? '';
+      this.resource = data['resource'] ?? 'placeholder';
+      this.configurePage();
+    });
+  }
 
+  private configurePage(): void {
     if (this.resource === 'placeholder') {
       this.placeholder = true;
       this.loading = false;
+      this.flushView();
       return;
     }
 
@@ -106,17 +121,22 @@ export class AdminResourcePageComponent {
       this.placeholder = true;
       this.placeholderMessage = 'Sessão master não encontrada.';
       this.loading = false;
+      this.flushView();
       return;
     }
 
+    this.placeholder = false;
+    this.rows = [];
+    this.filteredRows = [];
+    this.planOptions = [];
+    this.accountOptions = [];
+    this.moduleOptions = [];
+    this.supportOptionsLoaded = false;
     this.createForm = this.buildForm();
+
     const config = this.resourceConfig(token);
     this.columns = config.columns;
-    this.sortOptions = config.columns.map((column) => ({
-      id: column.field,
-      text: column.headerText
-    }));
-
+    this.sortOptions = config.columns.map((column) => ({ id: column.field, text: column.headerText }));
     this.restoreState(config.sortField);
 
     if (this.resource === 'accounts' || this.resource === 'accountModules') {
@@ -131,17 +151,14 @@ export class AdminResourcePageComponent {
   }
 
   private persistState(): void {
-    localStorage.setItem(
-      this.stateKey(),
-      JSON.stringify({
-        searchTerm: this.searchTerm,
-        appliedSearch: this.appliedSearch,
-        pageSize: this.pageSize,
-        offset: this.offset,
-        sortField: this.sortField,
-        sortDirection: this.sortDirection
-      })
-    );
+    localStorage.setItem(this.stateKey(), JSON.stringify({
+      searchTerm: this.searchTerm,
+      appliedSearch: this.appliedSearch,
+      pageSize: this.pageSize,
+      offset: this.offset,
+      sortField: this.sortField,
+      sortDirection: this.sortDirection
+    }));
   }
 
   private restoreState(defaultSortField: string): void {
@@ -179,19 +196,19 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createAccount(token, payload),
           update: (payload) => this.adminDataService.updateAccount(token, payload),
           remove: (id) => this.adminDataService.deleteAccount(token, id),
-          sortField: 'id',
+          sortField: 'code',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Código', width: 140 },
-            { field: 'name', headerText: 'Nome da conta', width: 260 },
+            { field: 'code', headerText: 'Código', width: 170 },
+            { field: 'name', headerText: 'Conta', width: 260 },
             { field: 'document', headerText: 'Documento', width: 180 },
-            { field: 'email', headerText: 'E-mail', width: 260 },
+            { field: 'email', headerText: 'E-mail', width: 240 },
             { field: 'phone', headerText: 'Telefone', width: 170 },
-            { field: 'status_label', headerText: 'Status', width: 150 },
+            { field: 'status_label', headerText: 'Status', width: 140 },
             { field: 'plan_name', headerText: 'Plano', width: 220 },
             { field: 'storage_limit_label', headerText: 'Limite de armazenamento', width: 190 },
-            { field: 'storage_used_label', headerText: 'Armazenamento usado', width: 190 },
-            { field: 'expiration_date_label', headerText: 'Expiração', width: 150 },
+            { field: 'storage_used_label', headerText: 'Armazenamento usado', width: 180 },
+            { field: 'expiration_date_label', headerText: 'Expiração', width: 140 },
             { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
@@ -201,16 +218,16 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createPlan(token, payload),
           update: (payload) => this.adminDataService.updatePlan(token, payload),
           remove: (id) => this.adminDataService.deletePlan(token, id),
-          sortField: 'id',
+          sortField: 'name',
           supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
             { field: 'description', headerText: 'Descrição', width: 320 },
             { field: 'price_label', headerText: 'Preço', width: 150 },
-            { field: 'max_companies', headerText: 'Máx. empresas', width: 140 },
-            { field: 'max_users', headerText: 'Máx. usuários', width: 140 },
-            { field: 'max_works', headerText: 'Máx. obras', width: 130 },
-            { field: 'max_storage_label', headerText: 'Armazenamento', width: 170 },
+            { field: 'max_companies', headerText: 'Máx. empresas', width: 150 },
+            { field: 'max_users', headerText: 'Máx. usuários', width: 150 },
+            { field: 'max_works', headerText: 'Máx. obras', width: 140 },
+            { field: 'max_storage_label', headerText: 'Armazenamento', width: 150 },
             { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
@@ -220,12 +237,12 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createModule(token, payload),
           update: (payload) => this.adminDataService.updateModule(token, payload),
           remove: (id) => this.adminDataService.deleteModule(token, id),
-          sortField: 'id',
+          sortField: 'name',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Código', width: 140 },
-            { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'description', headerText: 'Descrição', width: 340 },
+            { field: 'code', headerText: 'Código', width: 170 },
+            { field: 'name', headerText: 'Nome', width: 230 },
+            { field: 'description', headerText: 'Descrição', width: 360 },
             { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
@@ -235,11 +252,11 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createMasterUser(token, payload),
           update: (payload) => this.adminDataService.updateMasterUser(token, payload),
           remove: (id) => this.adminDataService.deleteMasterUser(token, id),
-          sortField: 'id',
+          sortField: 'name',
           supportsPaging: false,
           columns: [
             { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'login', headerText: 'Login', width: 160 },
+            { field: 'login', headerText: 'Login', width: 180 },
             { field: 'email', headerText: 'E-mail', width: 260 },
             { field: 'role_label', headerText: 'Perfil', width: 150 },
             { field: 'phone', headerText: 'Telefone', width: 170 },
@@ -252,12 +269,12 @@ export class AdminResourcePageComponent {
           create: (payload) => this.adminDataService.createAccountModule(token, payload),
           update: (payload) => this.adminDataService.updateAccountModule(token, payload),
           remove: (id) => this.adminDataService.deleteAccountModule(token, id),
-          sortField: 'id',
+          sortField: 'account_name',
           supportsPaging: true,
           columns: [
-            { field: 'account_name', headerText: 'Conta', width: 260 },
-            { field: 'module_code', headerText: 'Código do módulo', width: 180 },
+            { field: 'account_name', headerText: 'Conta', width: 280 },
             { field: 'module_name', headerText: 'Módulo', width: 260 },
+            { field: 'module_code', headerText: 'Código do módulo', width: 190 },
             { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
@@ -274,43 +291,6 @@ export class AdminResourcePageComponent {
     }
   }
 
-  private loadSupportOptions(token: string): void {
-    this.supportOptionsLoaded = true;
-
-    if (this.resource === 'accounts' || this.resource === 'accountModules') {
-      this.adminDataService.plans(token).subscribe({
-        next: (response) => {
-          this.planOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: item.name }));
-          if (this.resource === 'accounts' && this.rows.length) {
-            this.filteredRows = this.mapRowsForDisplay(this.rows);
-            this.cdr.detectChanges();
-          }
-        }
-      });
-    }
-
-    if (this.resource === 'accountModules') {
-      this.adminDataService.accounts(token).subscribe({
-        next: (response) => {
-          this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} · ${item.name}` }));
-          if (this.rows.length) {
-            this.filteredRows = this.mapRowsForDisplay(this.rows);
-            this.cdr.detectChanges();
-          }
-        }
-      });
-      this.adminDataService.modules(token).subscribe({
-        next: (response) => {
-          this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} · ${item.name}` }));
-          if (this.rows.length) {
-            this.filteredRows = this.mapRowsForDisplay(this.rows);
-            this.cdr.detectChanges();
-          }
-        }
-      });
-    }
-  }
-
   private ensureSupportOptionsLoaded(): void {
     if (this.supportOptionsLoaded) {
       return;
@@ -321,7 +301,47 @@ export class AdminResourcePageComponent {
       return;
     }
 
-    this.loadSupportOptions(token);
+    this.supportOptionsLoaded = true;
+
+    if (this.resource === 'accounts' || this.resource === 'accountModules') {
+      this.adminDataService.plans(token).subscribe({
+        next: (response) => {
+          this.planOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: item.name }));
+          this.refreshGridRows();
+        }
+      });
+    }
+
+    if (this.resource === 'accountModules') {
+      this.adminDataService.accounts(token).subscribe({
+        next: (response) => {
+          this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} · ${item.name}` }));
+          this.refreshGridRows();
+        }
+      });
+
+      this.adminDataService.modules(token).subscribe({
+        next: (response) => {
+          this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} · ${item.name}` }));
+          this.refreshGridRows();
+        }
+      });
+    }
+  }
+
+  private refreshGridRows(): void {
+    if (!this.rows.length) {
+      return;
+    }
+    this.filteredRows = this.mapRowsForDisplay(this.rows);
+    this.flushView();
+  }
+
+  private flushView(): void {
+    queueMicrotask(() => {
+      window.dispatchEvent(new Event('resize'));
+      this.cdr.detectChanges();
+    });
   }
 
   private loadPage(): void {
@@ -333,22 +353,20 @@ export class AdminResourcePageComponent {
     this.loading = true;
     this.placeholder = false;
     this.persistState();
-    const config = this.resourceConfig(token);
-    const requestParams = config.supportsPaging === false
-      ? {}
-      : {
-          search: this.appliedSearch,
-          sort_field: this.sortField,
-          sort_direction: this.sortDirection,
-          limit: this.pageSize,
-          offset: this.offset
-        };
 
-    config
-      .list(requestParams)
+    const config = this.resourceConfig(token);
+    const requestParams = config.supportsPaging === false ? {} : {
+      search: this.appliedSearch,
+      sort_field: this.sortField,
+      sort_direction: this.sortDirection,
+      limit: this.pageSize,
+      offset: this.offset
+    };
+
+    config.list(requestParams)
       .pipe(finalize(() => {
         this.loading = false;
-        this.cdr.detectChanges();
+        this.flushView();
       }))
       .subscribe({
         next: (response) => {
@@ -359,41 +377,28 @@ export class AdminResourcePageComponent {
             this.filteredRows = [];
             this.totalItems = 0;
             this.hasNext = false;
-            this.returnedCount = 0;
-            this.cdr.detectChanges();
             return;
           }
 
           const payload = response.data as AdminPagedResponse<any> | any[];
           this.rows = this.extractItems(payload);
           this.filteredRows = this.mapRowsForDisplay(this.rows);
-          const pagination = !Array.isArray(payload) ? payload?.pagination : null;
-          this.returnedCount = pagination?.returned ?? this.rows.length;
+          const pagination = Array.isArray(payload) ? null : payload?.pagination;
           this.totalItems = pagination?.total ?? this.rows.length;
           this.hasNext = pagination?.has_next ?? false;
           this.currentPage = Math.floor(this.offset / this.pageSize) + 1;
 
           if (config.supportsPaging === false) {
-            this.returnedCount = this.rows.length;
             this.totalItems = this.rows.length;
             this.hasNext = false;
             this.currentPage = 1;
           }
-
-          queueMicrotask(() => {
-            window.dispatchEvent(new Event('resize'));
-            this.cdr.detectChanges();
-          });
         },
-        error: (error: any) => {
+        error: (error) => {
           this.placeholder = true;
-          this.placeholderMessage = error?.error?.message || 'Falha ao carregar dados administrativos.';
+          this.placeholderMessage = error?.error?.message || 'Falha na conexão com a base de dados.';
           this.rows = [];
           this.filteredRows = [];
-          queueMicrotask(() => {
-            window.dispatchEvent(new Event('resize'));
-            this.cdr.detectChanges();
-          });
         }
       });
   }
@@ -402,7 +407,12 @@ export class AdminResourcePageComponent {
     return rows.map((row) => {
       if (this.resource === 'accounts') {
         return {
-          ...row,
+          id: row.id,
+          code: row.code,
+          name: row.name,
+          document: row.document,
+          email: row.email,
+          phone: row.phone,
           status_label: this.accountStatusLabel(row.status),
           plan_name: this.planName(row.plan_id),
           storage_limit_label: this.formatStorage(row.storage_limit_mb),
@@ -414,8 +424,13 @@ export class AdminResourcePageComponent {
 
       if (this.resource === 'plans') {
         return {
-          ...row,
+          id: row.id,
+          name: row.name,
+          description: row.description,
           price_label: this.formatCurrency(row.price),
+          max_companies: row.max_companies,
+          max_users: row.max_users,
+          max_works: row.max_works,
           max_storage_label: this.formatStorage(row.max_storage_mb),
           active_label: this.activityLabel(row.active)
         };
@@ -423,24 +438,32 @@ export class AdminResourcePageComponent {
 
       if (this.resource === 'modules') {
         return {
-          ...row,
+          id: row.id,
+          code: row.code,
+          name: row.name,
+          description: row.description,
           active_label: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'masterUsers') {
         return {
-          ...row,
+          id: row.id,
+          name: row.name,
+          login: row.login,
+          email: row.email,
           role_label: this.roleLabel(row.role),
+          phone: row.phone,
           active_label: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'accountModules') {
         return {
-          ...row,
+          id: row.id,
           account_name: row.account_name || this.accountName(row.account_id),
           module_name: row.module_name || this.moduleName(row.module_code),
+          module_code: row.module_code,
           active_label: this.activityLabel(row.active)
         };
       }
@@ -450,28 +473,22 @@ export class AdminResourcePageComponent {
   }
 
   private formatCurrency(value: any): string {
-    const number = Number(value ?? 0);
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value ?? 0));
   }
 
   private formatDate(value: any): string {
-    if (!value) {
-      return '-';
-    }
+    if (!value) return '-';
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) {
-      return String(value);
-    }
+    if (Number.isNaN(date.getTime())) return String(value);
     return new Intl.DateTimeFormat('pt-BR').format(date);
   }
 
   private formatStorage(value: any): string {
-    const number = Number(value ?? 0);
-    return `${new Intl.NumberFormat('pt-BR').format(number)} MB`;
+    return `${new Intl.NumberFormat('pt-BR').format(Number(value ?? 0))} MB`;
   }
 
   private activityLabel(value: any): string {
-    return value ? '● Ativo' : '○ Inativo';
+    return value ? 'Ativo' : 'Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -480,25 +497,25 @@ export class AdminResourcePageComponent {
     if (role === 'manager') return 'Gestor';
     if (role === 'support') return 'Suporte';
     if (role === 'user') return 'Usuário';
-    return value ?? '-';
+    return String(value ?? '-');
   }
 
   private accountStatusLabel(value: any): string {
     const status = Number(value ?? 0);
-    if (status === 1) return '● Ativa';
-    if (status === 2) return '● Suspensa';
-    if (status === 3) return '● Bloqueada';
+    if (status === 1) return 'Ativa';
+    if (status === 2) return 'Suspensa';
+    if (status === 3) return 'Bloqueada';
     return String(value ?? '-');
   }
 
   private planName(planId: any): string {
     const option = this.planOptions.find((item) => Number(item.id) === Number(planId));
-    return option?.text || `Plano ${planId ?? '-'}`;
+    return option?.text || `Plano #${planId ?? '-'}`;
   }
 
   private accountName(accountId: any): string {
     const option = this.accountOptions.find((item) => Number(item.id) === Number(accountId));
-    return option?.text || `Conta ${accountId ?? '-'}`;
+    return option?.text || `Conta #${accountId ?? '-'}`;
   }
 
   private moduleName(moduleCode: any): string {
@@ -637,17 +654,13 @@ export class AdminResourcePageComponent {
   }
 
   previousPage(): void {
-    if (this.offset <= 0) {
-      return;
-    }
+    if (this.offset <= 0) return;
     this.offset = Math.max(0, this.offset - this.pageSize);
     this.loadPage();
   }
 
   nextPage(): void {
-    if (!this.hasNext) {
-      return;
-    }
+    if (!this.hasNext) return;
     this.offset += this.pageSize;
     this.loadPage();
   }
@@ -658,8 +671,8 @@ export class AdminResourcePageComponent {
     this.loadPage();
   }
 
-  changeSortDirection(direction: 'asc' | 'desc'): void {
-    this.sortDirection = direction;
+  changeSortDirection(direction: string): void {
+    this.sortDirection = direction === 'asc' ? 'asc' : 'desc';
     this.offset = 0;
     this.loadPage();
   }
@@ -671,23 +684,15 @@ export class AdminResourcePageComponent {
   }
 
   dialogTitle(): string {
-    if (this.dialogMode === 'edit') {
-      return `Editar registro · ${this.title}`;
-    }
-    if (this.dialogMode === 'duplicate') {
-      return `Duplicar registro · ${this.title}`;
-    }
+    if (this.dialogMode === 'edit') return `Editar registro · ${this.title}`;
+    if (this.dialogMode === 'duplicate') return `Duplicar registro · ${this.title}`;
     return `Novo registro · ${this.title}`;
   }
 
   canDelete(row: any): boolean {
     const session = this.loginService.getLocalToken();
-    if (this.resource === 'masterUsers' && session?.user?.id === row?.id) {
-      return false;
-    }
-    if (this.resource === 'modules' && ['DIARY', 'PRODUCTION', 'AUDIT'].includes(String(row?.code || '').toUpperCase())) {
-      return false;
-    }
+    if (this.resource === 'masterUsers' && session?.user?.id === row?.id) return false;
+    if (this.resource === 'modules' && ['DIARY', 'PRODUCTION', 'AUDIT'].includes(String(row?.code || '').toUpperCase())) return false;
     return true;
   }
 
@@ -704,7 +709,7 @@ export class AdminResourcePageComponent {
       return 'Você não pode remover sua própria sessão master.';
     }
     if (this.resource === 'modules' && ['DIARY', 'PRODUCTION', 'AUDIT'].includes(String(row?.code || '').toUpperCase())) {
-      return 'Módulos base da plataforma não devem ser removidos visualmente.';
+      return 'Os módulos base da plataforma não devem ser removidos.';
     }
     return '';
   }
@@ -715,12 +720,10 @@ export class AdminResourcePageComponent {
   }
 
   exportCsv(): void {
-    const headers = this.columns.map((item) => item.headerText);
+    const headers = [...this.columns.map((item) => item.headerText)];
     const fields = this.columns.map((item) => item.field);
     const rows = this.filteredRows.map((row) =>
-      fields
-        .map((field) => `"${String(row?.[field] ?? '').replace(/"/g, '""')}"`)
-        .join(',')
+      fields.map((field) => `"${String(row?.[field] ?? '').replace(/"/g, '""')}"`).join(',')
     );
     const csv = [headers.join(','), ...rows].join('\n');
     this.downloadBlob('text/csv;charset=utf-8', csv, `${this.resource}-pagina-${this.currentPage}.csv`);
@@ -729,10 +732,9 @@ export class AdminResourcePageComponent {
 
   maskField(controlName: string): void {
     const control = this.createForm.get(controlName);
-    const value = String(control?.value ?? '');
-    if (!control) {
-      return;
-    }
+    if (!control) return;
+
+    const value = String(control.value ?? '');
 
     if (controlName === 'document') {
       const digits = value.replace(/\D/g, '').slice(0, 14);
@@ -751,21 +753,11 @@ export class AdminResourcePageComponent {
 
   fieldError(controlName: string): string {
     const control = this.createForm.get(controlName);
-    if (!control || !control.touched || !control.errors) {
-      return '';
-    }
-    if (control.errors['required']) {
-      return 'Campo obrigatório.';
-    }
-    if (control.errors['email']) {
-      return 'Informe um e-mail válido.';
-    }
-    if (control.errors['pattern']) {
-      return 'Formato inválido.';
-    }
-    if (control.errors['min']) {
-      return 'Valor abaixo do mínimo permitido.';
-    }
+    if (!control || !control.touched || !control.errors) return '';
+    if (control.errors['required']) return 'Campo obrigatório.';
+    if (control.errors['email']) return 'Informe um e-mail válido.';
+    if (control.errors['pattern']) return 'Formato inválido.';
+    if (control.errors['min']) return 'Valor abaixo do mínimo permitido.';
     return 'Valor inválido.';
   }
 
@@ -941,52 +933,34 @@ export class AdminResourcePageComponent {
 
   private createRequest(token: string, payload: Record<string, any>): Observable<any> {
     switch (this.resource) {
-      case 'accounts':
-        return this.adminDataService.createAccount(token, payload);
-      case 'plans':
-        return this.adminDataService.createPlan(token, payload);
-      case 'modules':
-        return this.adminDataService.createModule(token, payload);
-      case 'masterUsers':
-        return this.adminDataService.createMasterUser(token, payload);
-      case 'accountModules':
-        return this.adminDataService.createAccountModule(token, payload);
-      default:
-        return this.adminDataService.createModule(token, payload);
+      case 'accounts': return this.adminDataService.createAccount(token, payload);
+      case 'plans': return this.adminDataService.createPlan(token, payload);
+      case 'modules': return this.adminDataService.createModule(token, payload);
+      case 'masterUsers': return this.adminDataService.createMasterUser(token, payload);
+      case 'accountModules': return this.adminDataService.createAccountModule(token, payload);
+      default: return this.adminDataService.createModule(token, payload);
     }
   }
 
   private updateRequest(token: string, payload: Record<string, any>): Observable<any> {
     switch (this.resource) {
-      case 'accounts':
-        return this.adminDataService.updateAccount(token, payload);
-      case 'plans':
-        return this.adminDataService.updatePlan(token, payload);
-      case 'modules':
-        return this.adminDataService.updateModule(token, payload);
-      case 'masterUsers':
-        return this.adminDataService.updateMasterUser(token, payload);
-      case 'accountModules':
-        return this.adminDataService.updateAccountModule(token, payload);
-      default:
-        return this.adminDataService.updateModule(token, payload);
+      case 'accounts': return this.adminDataService.updateAccount(token, payload);
+      case 'plans': return this.adminDataService.updatePlan(token, payload);
+      case 'modules': return this.adminDataService.updateModule(token, payload);
+      case 'masterUsers': return this.adminDataService.updateMasterUser(token, payload);
+      case 'accountModules': return this.adminDataService.updateAccountModule(token, payload);
+      default: return this.adminDataService.updateModule(token, payload);
     }
   }
 
   private deleteRequest(token: string, id: number): Observable<any> {
     switch (this.resource) {
-      case 'accounts':
-        return this.adminDataService.deleteAccount(token, id);
-      case 'plans':
-        return this.adminDataService.deletePlan(token, id);
-      case 'modules':
-        return this.adminDataService.deleteModule(token, id);
-      case 'masterUsers':
-        return this.adminDataService.deleteMasterUser(token, id);
-      case 'accountModules':
-        return this.adminDataService.deleteAccountModule(token, id);
-      default:
-        return this.adminDataService.deleteModule(token, id);
+      case 'accounts': return this.adminDataService.deleteAccount(token, id);
+      case 'plans': return this.adminDataService.deletePlan(token, id);
+      case 'modules': return this.adminDataService.deleteModule(token, id);
+      case 'masterUsers': return this.adminDataService.deleteMasterUser(token, id);
+      case 'accountModules': return this.adminDataService.deleteAccountModule(token, id);
+      default: return this.adminDataService.deleteModule(token, id);
     }
   }
 }

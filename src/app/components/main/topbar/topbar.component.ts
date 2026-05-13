@@ -47,11 +47,11 @@ export class TopbarComponent {
       return;
     }
 
-    this.router.navigate(['/main/accounts']);
+    void this.router.navigate(['/main/accounts']);
   }
 
   openNotifications(): void {
-    this.router.navigate(['/main/logs']);
+    void this.router.navigate(['/main/logs']);
   }
 
   private syncTitle(): void {

@@ -92,11 +92,11 @@ export class MenuComponent {
 
   navigate(route: string): void {
     this.currentRoute = route;
-    this.router.navigate([route]);
+    void this.router.navigate([route]);
   }
 
   logout(): void {
     this.loginService.clearToken();
-    this.router.navigate(['/login']);
+    void this.router.navigate(['/login']);
   }
 }

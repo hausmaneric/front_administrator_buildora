@@ -186,7 +186,7 @@ export class AdminDashboardService {
   }
 
   private recentLogs(modules: AdminModule[], ready: any, environment: any): LogRow[] {
-    const logs: LogRow[] = [
+    return [
       {
         title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal requer validação',
         dateTime: '31/05/2024 10:23',
@@ -216,8 +216,6 @@ export class AdminDashboardService {
         toneLabel: 'Sucesso'
       }
     ];
-
-    return logs;
   }
 
   private alerts(accounts: AdminAccount[], storagePercent: number): AlertRow[] {
@@ -229,7 +227,7 @@ export class AdminDashboardService {
       tone: index % 2 === 0 ? 'danger' : 'warning'
     }));
 
-    if (alertRows.length === 0) {
+    if (!alertRows.length) {
       alertRows.push({
         title: 'Ambiente estável',
         message: 'Nenhum alerta crítico identificado',

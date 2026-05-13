@@ -67,7 +67,7 @@ export class TenantBootstrapPageComponent {
     this.adminDataService.accounts(token)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: (response) => {
+        next: response => {
           const rows = this.extractItems(response.data);
           this.accounts = rows.map((item: any) => ({
             id: item.code,
@@ -75,7 +75,7 @@ export class TenantBootstrapPageComponent {
             raw: item
           }));
         },
-        error: (error) => {
+        error: error => {
           this.error = error?.error?.message || 'Falha ao carregar contas para bootstrap.';
         }
       });
@@ -105,7 +105,7 @@ export class TenantBootstrapPageComponent {
     this.adminDataService.bootstrapTenant(token, accountCode, payload)
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
-        next: (response) => {
+        next: response => {
           if (!response.status) {
             this.error = response.message || 'Falha ao executar bootstrap do tenant.';
             return;
@@ -113,7 +113,7 @@ export class TenantBootstrapPageComponent {
 
           this.message = response.message || 'Bootstrap do tenant executado com sucesso.';
         },
-        error: (error) => {
+        error: error => {
           this.error = error?.error?.message || 'Falha ao executar bootstrap do tenant.';
         }
       });

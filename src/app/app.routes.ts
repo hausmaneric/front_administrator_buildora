@@ -62,7 +62,11 @@ export const routes: Routes = [
       },
       {
         path: 'tenant-bootstrap',
-        component: TenantBootstrapPageComponent
+        component: TenantBootstrapPageComponent,
+        data: {
+          title: 'Onboarding Tenant',
+          subtitle: 'Preparação inicial do ambiente do tenant'
+        }
       },
       {
         path: 'subscriptions',

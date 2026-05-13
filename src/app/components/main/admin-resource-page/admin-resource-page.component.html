@@ -30,15 +30,13 @@
   } @else {
     <article class="resource-body orb-card">
       <div class="resource-topline">
-        <div class="resource-meta">
-          <div class="resource-count">{{ totalRowsLabel() }}</div>
-          <div class="quick-metrics">
-            <span class="metric-pill">Total: <strong>{{ totalItems }}</strong></span>
-            <span class="metric-pill">Página: <strong>{{ currentPage }}</strong></span>
-            <span class="metric-pill">Mostrando: <strong>{{ rows.length }}</strong></span>
-            <span class="metric-pill">Busca: <strong>{{ appliedSearch || 'Sem filtro' }}</strong></span>
-          </div>
+        <div class="resource-summary">
+          <span class="metric-pill">Total: <strong>{{ totalItems }}</strong></span>
+          <span class="metric-pill">Página: <strong>{{ currentPage }}</strong></span>
+          <span class="metric-pill">Mostrando: <strong>{{ rows.length }}</strong></span>
+          <span class="metric-pill">Busca: <strong>{{ appliedSearch || 'Sem filtro' }}</strong></span>
         </div>
+
         <div class="resource-topline-actions">
           <button ejs-button class="primary-action" type="button" (click)="openCreateDialog()">Novo cadastro</button>
         </div>
@@ -86,25 +84,32 @@
 
       @if (filteredRows.length) {
         <div class="grid-shell">
-          <ejs-grid [dataSource]="filteredRows" [allowResizing]="true" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-            @for (column of columns; track column.field) {
-              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-            }
-            <e-column headerText="Ações" [width]="250">
-              <ng-template #template let-data>
-                <div class="row-actions">
-                  <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
-                  <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
-                  <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
-                </div>
-              </ng-template>
-            </e-column>
+          <ejs-grid
+            [dataSource]="filteredRows"
+            [allowResizing]="true"
+            [allowSorting]="true"
+            [gridLines]="'Horizontal'"
+            [rowHeight]="54">
+            <e-columns>
+              @for (column of columns; track column.field) {
+                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
+              }
+              <e-column headerText="Ações" [width]="220">
+                <ng-template #template let-data>
+                  <div class="row-actions">
+                    <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
+                    <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
+                    <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
+                  </div>
+                </ng-template>
+              </e-column>
+            </e-columns>
           </ejs-grid>
         </div>
 
         <div class="pager-bar">
           <button ejs-button cssClass="dialog-secondary" type="button" [disabled]="offset <= 0" (click)="previousPage()">Anterior</button>
-          <div class="pager-info">Página {{ currentPage }} · {{ rows.length }} itens nesta página</div>
+          <div class="pager-info">{{ totalRowsLabel() }}</div>
           <button ejs-button cssClass="dialog-primary" type="button" [disabled]="!hasNext" (click)="nextPage()">Próxima</button>
         </div>
       } @else {

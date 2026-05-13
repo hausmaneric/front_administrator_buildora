@@ -54,9 +54,11 @@
         @if (filteredRows.length) {
           <div class="ops-grid-shell">
             <ejs-grid [dataSource]="filteredRows" [allowSorting]="true" [allowResizing]="true" [gridLines]="'Horizontal'" [rowHeight]="50">
-              @for (column of columns; track column.field) {
-                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-              }
+              <e-columns>
+                @for (column of columns; track column.field) {
+                  <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+                }
+              </e-columns>
             </ejs-grid>
           </div>
         } @else {
