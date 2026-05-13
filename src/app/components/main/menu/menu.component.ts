@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
+import { filter } from 'rxjs';
 import { LoginService } from '../../../services/login.service';
 
 type MenuItem = {
@@ -37,15 +38,15 @@ export class MenuComponent {
   sections: MenuSection[] = [
     {
       id: 'gestao',
-      name: 'GESTÃO',
+      name: 'GESTAO',
       items: [
         { id: 'accounts', name: 'Empresas / Contas', iconKey: 'briefcase', route: '/main/accounts' },
         { id: 'plans', name: 'Planos', iconKey: 'wallet', route: '/main/plans' },
-        { id: 'modules', name: 'Módulos', iconKey: 'grid', route: '/main/modules' },
-        { id: 'account-modules', name: 'Módulos por Conta', iconKey: 'link', route: '/main/account-modules' },
+        { id: 'modules', name: 'Modulos', iconKey: 'grid', route: '/main/modules' },
+        { id: 'account-modules', name: 'Modulos por Conta', iconKey: 'link', route: '/main/account-modules' },
         { id: 'subscriptions', name: 'Assinaturas', iconKey: 'receipt', route: '/main/subscriptions' },
         { id: 'storage', name: 'Armazenamento', iconKey: 'cloud', route: '/main/storage' },
-        { id: 'master-users', name: 'Usuários Master', iconKey: 'users', route: '/main/master-users' },
+        { id: 'master-users', name: 'Usuarios Master', iconKey: 'users', route: '/main/master-users' },
         { id: 'tenant-bootstrap', name: 'Onboarding Tenant', iconKey: 'rocket', route: '/main/tenant-bootstrap' }
       ]
     },
@@ -61,17 +62,17 @@ export class MenuComponent {
     },
     {
       id: 'reports',
-      name: 'RELATÓRIOS',
+      name: 'RELATORIOS',
       items: [
-        { id: 'metrics', name: 'Métricas', iconKey: 'chart', route: '/main/metrics' },
+        { id: 'metrics', name: 'Metricas', iconKey: 'chart', route: '/main/metrics' },
         { id: 'financial', name: 'Financeiro', iconKey: 'coin', route: '/main/financial' }
       ]
     },
     {
       id: 'settings',
-      name: 'CONFIGURAÇÕES',
+      name: 'CONFIGURACOES',
       items: [
-        { id: 'settings-page', name: 'Configurações', iconKey: 'settings', route: '/main/settings-page' }
+        { id: 'settings-page', name: 'Configuracoes', iconKey: 'settings', route: '/main/settings-page' }
       ]
     }
   ];
@@ -79,7 +80,13 @@ export class MenuComponent {
   constructor(
     private router: Router,
     private loginService: LoginService
-  ) {}
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => {
+        this.currentRoute = this.router.url;
+      });
+  }
 
   ngOnInit(): void {
     this.userName = this.loginService.getLocalToken()?.user?.name ?? 'Administrador';
@@ -91,6 +98,9 @@ export class MenuComponent {
   }
 
   navigate(route: string): void {
+    if (this.currentRoute === route) {
+      return;
+    }
     this.currentRoute = route;
     void this.router.navigate([route]);
   }

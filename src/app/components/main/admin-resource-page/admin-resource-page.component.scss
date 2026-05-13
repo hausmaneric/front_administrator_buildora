@@ -47,7 +47,7 @@
 }
 
 .resource-body {
-  padding: 16px 18px 14px;
+  padding: 16px 18px;
 }
 
 .resource-topline {
@@ -80,19 +80,19 @@
   align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .resource-search {
-  flex: 1 1 420px;
-  max-width: 440px;
+  flex: 1 1 460px;
+  max-width: 520px;
 }
 
 .resource-controls {
   display: grid;
-  grid-template-columns: repeat(3, minmax(240px, 340px));
+  grid-template-columns: repeat(3, minmax(260px, 360px));
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 .control-item {
@@ -133,6 +133,7 @@
   background: rgba(8, 22, 41, 0.55);
   scrollbar-color: rgba(91, 126, 186, 0.9) transparent;
   scrollbar-width: thin;
+  margin-bottom: 10px;
 }
 
 :host ::ng-deep .grid-shell .e-grid {
@@ -204,7 +205,7 @@
 
 :host ::ng-deep .grid-shell .e-table {
   width: max-content !important;
-  min-width: 100% !important;
+  min-width: 1180px !important;
 }
 
 :host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
@@ -261,7 +262,7 @@
 
 .row-action {
   min-height: 34px;
-  min-width: 72px;
+  min-width: 78px;
   border-radius: 10px;
   font-size: 0.78rem;
   font-weight: 700;
