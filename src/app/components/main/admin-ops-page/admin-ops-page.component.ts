@@ -320,29 +320,19 @@ export class AdminOpsPageComponent {
     const smoke = payload.smoke?.data ?? {};
 
     this.cards = [
-      { label: 'Migrations aplicadas', value: `${(migrations.migrations ?? []).filter((item: any) => item.applied).length}`, detail: `${(migrations.pending ?? []).length} pendentes` },
-      { label: 'Bootstrap master', value: bootstrap.master_seed ? 'Executado' : 'Pendente', detail: bootstrap.schema_version?.metadata_value ?? 'sem versão' },
-      { label: 'Etapas do smoke test', value: `${(smoke.steps ?? []).length}`, detail: 'Checklist operacional' }
-    ];
-
-    this.rows = (migrations.migrations ?? []).map((item: any) => ({
-      file: item.file,
-      version: item.version,
-      applied: item.applied ? 'Sim' : 'Não',
-      applied_at: item.applied_at ? this.formatDateTime(item.applied_at) : '-'
-    }));
-    this.applyFilter();
-    this.columns = [
-      { field: 'file', headerText: 'Arquivo', width: 270 },
-      { field: 'version', headerText: 'Versão', width: 120 },
-      { field: 'applied', headerText: 'Aplicada', width: 110 },
-      { field: 'applied_at', headerText: 'Registro', width: 180 }
+      { label: 'Migrations pendentes', value: `${(migrations.pending ?? []).length}`, detail: `${(migrations.applied ?? []).length} aplicadas` },
+      { label: 'Bootstrap master', value: bootstrap.seeded ? 'Concluído' : 'Pendente', detail: bootstrap.schema_version ?? 'sem versão' },
+      { label: 'Etapas smoke', value: `${(smoke.stages ?? []).length}`, detail: 'Checklist operacional' }
     ];
 
     this.panels = [
       {
-        title: 'Próximas ações administrativas',
-        lines: ['Aplicar migrations pendentes', 'Revalidar smoke plan', 'Revisar bootstrap master']
+        title: 'Migrations pendentes',
+        lines: (migrations.pending ?? []).length ? migrations.pending : ['Nenhuma migration pendente']
+      },
+      {
+        title: 'Plano de smoke test',
+        lines: (smoke.stages ?? []).map((item: any) => `${item.title}: ${item.goal}`) || ['Sem etapas cadastradas']
       }
     ];
   }
@@ -353,15 +343,23 @@ export class AdminOpsPageComponent {
     const environment = payload.environment?.data ?? {};
 
     this.cards = [
-      { label: 'Módulos catalogados', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catálogo modular da API' },
-      { label: 'Rotas públicas', value: `${routes.total_routes ?? 0}`, detail: 'Mapeadas automaticamente' },
-      { label: 'Runtime Python', value: environment.python_runtime ?? '-', detail: environment.name ?? 'OBRAX API' }
+      { label: 'Rotas públicas', value: `${routes.total_routes ?? 0}`, detail: 'Mapa de suporte' },
+      { label: 'Módulos documentados', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catálogo publicado' },
+      { label: 'Runtime Python', value: environment.python_runtime ?? '-', detail: 'Ambiente atual' }
     ];
 
     this.panels = [
       {
-        title: 'Links úteis do backend',
-        lines: ['/api/v1/routes', '/api/v1/catalog', '/api/v1/environment', '/api/v1/security-check', '/api/v1/smoke-plan']
+        title: 'Módulos disponíveis',
+        lines: Object.keys(catalog.modules ?? {}).length ? Object.keys(catalog.modules ?? {}) : ['Nenhum módulo documentado']
+      },
+      {
+        title: 'Banco principal',
+        lines: [
+          `Host: ${environment.database?.host ?? '-'}`,
+          `Porta: ${environment.database?.port ?? '-'}`,
+          `SSL: ${environment.database?.sslmode ?? '-'}`
+        ]
       }
     ];
   }
@@ -372,55 +370,55 @@ export class AdminOpsPageComponent {
     const modules = payload.modules?.data ?? [];
 
     this.cards = [
-      { label: 'Empresas', value: `${accounts.length}`, detail: 'Contas cadastradas' },
-      { label: 'Planos', value: `${plans.length}`, detail: 'Produtos disponíveis' },
-      { label: 'Módulos', value: `${modules.length}`, detail: 'Módulos habilitáveis' }
+      { label: 'Contas', value: `${accounts.length}`, detail: 'Base master atual' },
+      { label: 'Planos', value: `${plans.length}`, detail: 'Catálogo comercial' },
+      { label: 'Módulos', value: `${modules.length}`, detail: 'Componentes da plataforma' }
     ];
 
-    this.rows = plans.map((plan: any) => ({
-      plan: plan.name,
-      price: this.formatCurrency(plan.price),
-      max_users: plan.max_users,
-      max_storage_mb: this.formatStorage(plan.max_storage_mb)
+    this.rows = accounts.map((item: any) => ({
+      conta: item.name,
+      plano: plans.find((plan: any) => Number(plan.id) === Number(item.plan_id))?.name ?? `Plano #${item.plan_id}`,
+      armazenamento: this.formatStorage(item.storage_used_mb),
+      ativo: item.active ? 'Sim' : 'Não'
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'plan', headerText: 'Plano', width: 220 },
-      { field: 'price', headerText: 'Preço', width: 130 },
-      { field: 'max_users', headerText: 'Usuários', width: 120 },
-      { field: 'max_storage_mb', headerText: 'Armazenamento', width: 150 }
+      { field: 'conta', headerText: 'Conta', width: 260 },
+      { field: 'plano', headerText: 'Plano', width: 220 },
+      { field: 'armazenamento', headerText: 'Armazenamento', width: 170 },
+      { field: 'ativo', headerText: 'Ativo', width: 110 }
     ];
   }
 
   private mapFinancial(payload: any): void {
-    const accounts = (payload.accounts?.data ?? []) as any[];
-    const plans = (payload.plans?.data ?? []) as any[];
-    const planMap = new Map<number, any>(plans.map((item: any) => [Number(item.id), item]));
-    const revenue = accounts.reduce((sum: number, account: any) => {
-      const plan = planMap.get(Number(account.plan_id));
+    const accounts = payload.accounts?.data ?? [];
+    const plans = payload.plans?.data ?? [];
+    const projected = accounts.reduce((sum: number, account: any) => {
+      const plan = plans.find((item: any) => Number(item.id) === Number(account.plan_id));
       return sum + Number(plan?.price || 0);
     }, 0);
 
     this.cards = [
-      { label: 'Receita teórica', value: this.formatCurrency(revenue), detail: 'Soma dos planos vinculados' },
-      { label: 'Contas faturáveis', value: `${accounts.filter((item: any) => item.active).length}`, detail: 'Ativas no master' }
+      { label: 'Receita mensal projetada', value: this.formatCurrency(projected), detail: 'Somando planos vinculados' },
+      { label: 'Contas faturáveis', value: `${accounts.length}`, detail: 'Base contratual' },
+      { label: 'Ticket médio', value: this.formatCurrency(accounts.length ? projected / accounts.length : 0), detail: 'Por conta ativa' }
     ];
 
-    this.rows = accounts.map((account: any) => {
-      const plan = planMap.get(Number(account.plan_id));
+    this.rows = accounts.map((item: any) => {
+      const plan = plans.find((entry: any) => Number(entry.id) === Number(item.plan_id));
       return {
-        account: account.name,
-        code: account.code,
-        plan: plan?.name ?? '-',
-        price: this.formatCurrency(plan?.price ?? 0)
+        conta: item.name,
+        plano: plan?.name ?? `Plano #${item.plan_id}`,
+        valor: this.formatCurrency(plan?.price || 0),
+        vencimento: this.formatDate(item.expiration_date)
       };
     });
     this.applyFilter();
     this.columns = [
-      { field: 'account', headerText: 'Conta', width: 240 },
-      { field: 'code', headerText: 'Código', width: 150 },
-      { field: 'plan', headerText: 'Plano', width: 180 },
-      { field: 'price', headerText: 'Preço', width: 130 }
+      { field: 'conta', headerText: 'Conta', width: 260 },
+      { field: 'plano', headerText: 'Plano', width: 220 },
+      { field: 'valor', headerText: 'Valor', width: 150 },
+      { field: 'vencimento', headerText: 'Vencimento', width: 150 }
     ];
   }
 
@@ -430,19 +428,24 @@ export class AdminOpsPageComponent {
     const catalog = payload.catalog?.data ?? {};
 
     this.cards = [
-      { label: 'API', value: environment.version ?? '1.0.0', detail: environment.name ?? 'OBRAX API' },
-      { label: 'Módulos do catálogo', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Metadados públicos' },
-      { label: 'Segurança', value: security.secret_key_changed ? 'Pronta' : 'Revisar', detail: security.default_local_user ? 'Usuário default presente' : 'Sem usuário local padrão' }
+      { label: 'Secret key', value: security.secret_key_changed ? 'OK' : 'Revisar', detail: 'Segurança de produção' },
+      { label: 'Conexão principal', value: environment.database?.validation?.valid ? 'Válida' : 'Inválida', detail: environment.database?.validation?.mode ?? '-' },
+      { label: 'Módulos visíveis', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catálogo atual' }
     ];
 
     this.panels = [
       {
-        title: 'Configuração do ambiente',
+        title: 'Validação do banco',
+        lines: (environment.database?.validation?.issues ?? []).length
+          ? environment.database.validation.issues
+          : ['Sem inconsistências de configuração']
+      },
+      {
+        title: 'Segurança',
         lines: [
-          `Runtime: ${environment.python_runtime ?? '-'}`,
-          `DB host: ${environment.database?.host ?? '-'}`,
-          `DB sslmode: ${environment.database?.sslmode ?? '-'}`,
-          `Connection string presente: ${environment.database?.connection_string_present ? 'sim' : 'não'}`
+          `Secret key configurada: ${security.secret_key_configured ? 'sim' : 'não'}`,
+          `Secret key alterada: ${security.secret_key_changed ? 'sim' : 'não'}`,
+          `SSL requerido: ${security.database_ssl_required ? 'sim' : 'não'}`
         ]
       }
     ];
@@ -456,36 +459,27 @@ export class AdminOpsPageComponent {
     }
 
     this.filteredRows = this.rows.filter((row) =>
-      Object.values(row ?? {}).some((value) => String(value ?? '').toLowerCase().includes(term))
+      Object.values(row).some((value) => String(value ?? '').toLowerCase().includes(term))
     );
   }
 
-  private formatCurrency(value: any): string {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value ?? 0));
+  private formatCurrency(value: number): string {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
+  }
+
+  private formatStorage(value: number): string {
+    return `${new Intl.NumberFormat('pt-BR').format(Number(value || 0))} MB`;
   }
 
   private formatDate(value: any): string {
-    if (!value) return '-';
+    if (!value) {
+      return '-';
+    }
     const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
     return new Intl.DateTimeFormat('pt-BR').format(date);
-  }
-
-  private formatDateTime(value: any): string {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return String(value);
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date);
-  }
-
-  private formatStorage(value: any): string {
-    return `${new Intl.NumberFormat('pt-BR').format(Number(value ?? 0))} MB`;
   }
 
   private isAuthenticationFailure(message?: string): boolean {
