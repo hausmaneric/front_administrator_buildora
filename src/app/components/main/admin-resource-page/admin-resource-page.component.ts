@@ -73,7 +73,8 @@ export class AdminResourcePageComponent {
   roleOptions = [
     { id: 'admin', text: 'Administrador' },
     { id: 'manager', text: 'Gestor' },
-    { id: 'support', text: 'Suporte' }
+    { id: 'support', text: 'Suporte' },
+    { id: 'user', text: 'Usuário' }
   ];
 
   pageSizeOptions = [
@@ -137,11 +138,156 @@ export class AdminResourcePageComponent {
     this.sortOptions = config.columns.map((column) => ({ id: column.field, text: column.headerText }));
     this.restoreState(config.sortField);
 
-    if (this.resource === 'accounts' || this.resource === 'accountModules') {
-      this.ensureSupportOptionsLoaded();
+    this.loadSupportOptions();
+    this.loadPage();
+  }
+
+  private resourceConfig(token: string): ResourceConfig {
+    switch (this.resource) {
+      case 'accounts':
+        return {
+          list: (params) => this.adminDataService.accounts(token, params),
+          create: (payload) => this.adminDataService.createAccount(token, payload),
+          update: (payload) => this.adminDataService.updateAccount(token, payload),
+          remove: (id) => this.adminDataService.deleteAccount(token, id),
+          sortField: 'code',
+          supportsPaging: true,
+          columns: [
+            { field: 'code', headerText: 'Código', width: 180 },
+            { field: 'name', headerText: 'Conta', width: 320 },
+            { field: 'document', headerText: 'Documento', width: 200 },
+            { field: 'email', headerText: 'E-mail', width: 260 },
+            { field: 'phone', headerText: 'Telefone', width: 180 },
+            { field: 'status_display', headerText: 'Status', width: 150 },
+            { field: 'plan_display', headerText: 'Plano', width: 220 },
+            { field: 'storage_limit_display', headerText: 'Limite de armazenamento', width: 200 },
+            { field: 'storage_used_display', headerText: 'Armazenamento usado', width: 190 },
+            { field: 'expiration_display', headerText: 'Expiração', width: 150 },
+            { field: 'active_display', headerText: 'Situação', width: 140 }
+          ]
+        };
+      case 'plans':
+        return {
+          list: (params) => this.adminDataService.plans(token, params),
+          create: (payload) => this.adminDataService.createPlan(token, payload),
+          update: (payload) => this.adminDataService.updatePlan(token, payload),
+          remove: (id) => this.adminDataService.deletePlan(token, id),
+          sortField: 'name',
+          supportsPaging: true,
+          columns: [
+            { field: 'name', headerText: 'Plano', width: 220 },
+            { field: 'description', headerText: 'Descrição', width: 360 },
+            { field: 'price_display', headerText: 'Preço', width: 150 },
+            { field: 'max_companies', headerText: 'Máx. empresas', width: 150 },
+            { field: 'max_users', headerText: 'Máx. usuários', width: 150 },
+            { field: 'max_works', headerText: 'Máx. obras', width: 140 },
+            { field: 'max_storage_display', headerText: 'Armazenamento', width: 170 },
+            { field: 'active_display', headerText: 'Situação', width: 140 }
+          ]
+        };
+      case 'modules':
+        return {
+          list: (params) => this.adminDataService.modules(token, params),
+          create: (payload) => this.adminDataService.createModule(token, payload),
+          update: (payload) => this.adminDataService.updateModule(token, payload),
+          remove: (id) => this.adminDataService.deleteModule(token, id),
+          sortField: 'name',
+          supportsPaging: true,
+          columns: [
+            { field: 'code', headerText: 'Código', width: 180 },
+            { field: 'name', headerText: 'Nome', width: 260 },
+            { field: 'description', headerText: 'Descrição', width: 420 },
+            { field: 'active_display', headerText: 'Situação', width: 140 }
+          ]
+        };
+      case 'masterUsers':
+        return {
+          list: (params) => this.adminDataService.masterUsers(token, params),
+          create: (payload) => this.adminDataService.createMasterUser(token, payload),
+          update: (payload) => this.adminDataService.updateMasterUser(token, payload),
+          remove: (id) => this.adminDataService.deleteMasterUser(token, id),
+          sortField: 'name',
+          supportsPaging: false,
+          columns: [
+            { field: 'name', headerText: 'Nome', width: 240 },
+            { field: 'login', headerText: 'Login', width: 180 },
+            { field: 'email', headerText: 'E-mail', width: 280 },
+            { field: 'role_display', headerText: 'Perfil', width: 160 },
+            { field: 'phone', headerText: 'Telefone', width: 180 },
+            { field: 'active_display', headerText: 'Situação', width: 140 }
+          ]
+        };
+      case 'accountModules':
+        return {
+          list: (params) => this.adminDataService.accountModules(token, params),
+          create: (payload) => this.adminDataService.createAccountModule(token, payload),
+          update: (payload) => this.adminDataService.updateAccountModule(token, payload),
+          remove: (id) => this.adminDataService.deleteAccountModule(token, id),
+          sortField: 'account_name',
+          supportsPaging: true,
+          columns: [
+            { field: 'account_display', headerText: 'Conta', width: 320 },
+            { field: 'module_display', headerText: 'Módulo', width: 280 },
+            { field: 'module_code', headerText: 'Código do módulo', width: 210 },
+            { field: 'active_display', headerText: 'Situação', width: 140 }
+          ]
+        };
+      default:
+        return {
+          list: (params) => this.adminDataService.accounts(token, params),
+          create: (payload) => this.adminDataService.createAccount(token, payload),
+          update: (payload) => this.adminDataService.updateAccount(token, payload),
+          remove: (id) => this.adminDataService.deleteAccount(token, id),
+          sortField: 'id',
+          supportsPaging: true,
+          columns: []
+        };
+    }
+  }
+
+  private extractItems<T>(data: T[] | AdminPagedResponse<T> | null | undefined): T[] {
+    if (!data) {
+      return [];
+    }
+    return Array.isArray(data) ? data : data.items ?? [];
+  }
+
+  private loadSupportOptions(): void {
+    if (this.supportOptionsLoaded) {
+      return;
     }
 
-    this.loadPage();
+    const token = this.loginService.getToken();
+    if (!token) {
+      return;
+    }
+
+    this.supportOptionsLoaded = true;
+
+    if (this.resource === 'accounts' || this.resource === 'accountModules') {
+      this.adminDataService.plans(token).subscribe({
+        next: (response) => {
+          this.planOptions = this.extractItems(response?.data).map((item: any) => ({ id: item.id, text: item.name }));
+          this.refreshGridRows();
+        }
+      });
+    }
+
+    if (this.resource === 'accountModules') {
+      this.adminDataService.accounts(token).subscribe({
+        next: (response) => {
+          this.accountOptions = this.extractItems(response?.data).map((item: any) => ({ id: item.id, text: `${item.code} · ${item.name}` }));
+          this.refreshGridRows();
+        }
+      });
+
+      this.adminDataService.modules(token).subscribe({
+        next: (response) => {
+          this.moduleOptions = this.extractItems(response?.data).map((item: any) => ({ id: item.code, text: `${item.code} · ${item.name}` }));
+          this.refreshGridRows();
+        }
+      });
+    }
   }
 
   private stateKey(): string {
@@ -179,154 +325,6 @@ export class AdminResourcePageComponent {
     }
   }
 
-  private extractItems<T>(data: T[] | AdminPagedResponse<T> | null | undefined): T[] {
-    if (!data) {
-      return [];
-    }
-    return Array.isArray(data) ? data : data.items ?? [];
-  }
-
-  private resourceConfig(token: string): ResourceConfig {
-    switch (this.resource) {
-      case 'accounts':
-        return {
-          list: (params) => this.adminDataService.accounts(token, params),
-          create: (payload) => this.adminDataService.createAccount(token, payload),
-          update: (payload) => this.adminDataService.updateAccount(token, payload),
-          remove: (id) => this.adminDataService.deleteAccount(token, id),
-          sortField: 'code',
-          supportsPaging: true,
-          columns: [
-            { field: 'code', headerText: 'Código', width: 170 },
-            { field: 'name', headerText: 'Conta', width: 260 },
-            { field: 'document', headerText: 'Documento', width: 180 },
-            { field: 'email', headerText: 'E-mail', width: 240 },
-            { field: 'phone', headerText: 'Telefone', width: 170 },
-            { field: 'status_label', headerText: 'Status', width: 140 },
-            { field: 'plan_name', headerText: 'Plano', width: 220 },
-            { field: 'storage_limit_label', headerText: 'Limite de armazenamento', width: 190 },
-            { field: 'storage_used_label', headerText: 'Armazenamento usado', width: 180 },
-            { field: 'expiration_date_label', headerText: 'Expiração', width: 140 },
-            { field: 'active_label', headerText: 'Situação', width: 130 }
-          ]
-        };
-      case 'plans':
-        return {
-          list: (params) => this.adminDataService.plans(token, params),
-          create: (payload) => this.adminDataService.createPlan(token, payload),
-          update: (payload) => this.adminDataService.updatePlan(token, payload),
-          remove: (id) => this.adminDataService.deletePlan(token, id),
-          sortField: 'name',
-          supportsPaging: true,
-          columns: [
-            { field: 'name', headerText: 'Plano', width: 220 },
-            { field: 'description', headerText: 'Descrição', width: 320 },
-            { field: 'price_label', headerText: 'Preço', width: 150 },
-            { field: 'max_companies', headerText: 'Máx. empresas', width: 150 },
-            { field: 'max_users', headerText: 'Máx. usuários', width: 150 },
-            { field: 'max_works', headerText: 'Máx. obras', width: 140 },
-            { field: 'max_storage_label', headerText: 'Armazenamento', width: 150 },
-            { field: 'active_label', headerText: 'Situação', width: 130 }
-          ]
-        };
-      case 'modules':
-        return {
-          list: (params) => this.adminDataService.modules(token, params),
-          create: (payload) => this.adminDataService.createModule(token, payload),
-          update: (payload) => this.adminDataService.updateModule(token, payload),
-          remove: (id) => this.adminDataService.deleteModule(token, id),
-          sortField: 'name',
-          supportsPaging: true,
-          columns: [
-            { field: 'code', headerText: 'Código', width: 170 },
-            { field: 'name', headerText: 'Nome', width: 230 },
-            { field: 'description', headerText: 'Descrição', width: 360 },
-            { field: 'active_label', headerText: 'Situação', width: 130 }
-          ]
-        };
-      case 'masterUsers':
-        return {
-          list: (params) => this.adminDataService.masterUsers(token, params),
-          create: (payload) => this.adminDataService.createMasterUser(token, payload),
-          update: (payload) => this.adminDataService.updateMasterUser(token, payload),
-          remove: (id) => this.adminDataService.deleteMasterUser(token, id),
-          sortField: 'name',
-          supportsPaging: false,
-          columns: [
-            { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'login', headerText: 'Login', width: 180 },
-            { field: 'email', headerText: 'E-mail', width: 260 },
-            { field: 'role_label', headerText: 'Perfil', width: 150 },
-            { field: 'phone', headerText: 'Telefone', width: 170 },
-            { field: 'active_label', headerText: 'Situação', width: 130 }
-          ]
-        };
-      case 'accountModules':
-        return {
-          list: (params) => this.adminDataService.accountModules(token, params),
-          create: (payload) => this.adminDataService.createAccountModule(token, payload),
-          update: (payload) => this.adminDataService.updateAccountModule(token, payload),
-          remove: (id) => this.adminDataService.deleteAccountModule(token, id),
-          sortField: 'account_name',
-          supportsPaging: true,
-          columns: [
-            { field: 'account_name', headerText: 'Conta', width: 280 },
-            { field: 'module_name', headerText: 'Módulo', width: 260 },
-            { field: 'module_code', headerText: 'Código do módulo', width: 190 },
-            { field: 'active_label', headerText: 'Situação', width: 130 }
-          ]
-        };
-      default:
-        return {
-          list: (params) => this.adminDataService.accounts(token, params),
-          create: (payload) => this.adminDataService.createAccount(token, payload),
-          update: (payload) => this.adminDataService.updateAccount(token, payload),
-          remove: (id) => this.adminDataService.deleteAccount(token, id),
-          sortField: 'id',
-          supportsPaging: true,
-          columns: []
-        };
-    }
-  }
-
-  private ensureSupportOptionsLoaded(): void {
-    if (this.supportOptionsLoaded) {
-      return;
-    }
-
-    const token = this.loginService.getToken();
-    if (!token) {
-      return;
-    }
-
-    this.supportOptionsLoaded = true;
-
-    if (this.resource === 'accounts' || this.resource === 'accountModules') {
-      this.adminDataService.plans(token).subscribe({
-        next: (response) => {
-          this.planOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: item.name }));
-          this.refreshGridRows();
-        }
-      });
-    }
-
-    if (this.resource === 'accountModules') {
-      this.adminDataService.accounts(token).subscribe({
-        next: (response) => {
-          this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} · ${item.name}` }));
-          this.refreshGridRows();
-        }
-      });
-
-      this.adminDataService.modules(token).subscribe({
-        next: (response) => {
-          this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} · ${item.name}` }));
-          this.refreshGridRows();
-        }
-      });
-    }
-  }
-
   private refreshGridRows(): void {
     if (!this.rows.length) {
       return;
@@ -354,13 +352,15 @@ export class AdminResourcePageComponent {
     this.persistState();
 
     const config = this.resourceConfig(token);
-    const requestParams = config.supportsPaging === false ? {} : {
-      search: this.appliedSearch,
-      sort_field: this.sortField,
-      sort_direction: this.sortDirection,
-      limit: this.pageSize,
-      offset: this.offset
-    };
+    const requestParams = config.supportsPaging === false
+      ? {}
+      : {
+          search: this.appliedSearch,
+          sort_field: this.sortField,
+          sort_direction: this.sortDirection,
+          limit: this.pageSize,
+          offset: this.offset
+        };
 
     config.list(requestParams)
       .pipe(finalize(() => {
@@ -376,7 +376,7 @@ export class AdminResourcePageComponent {
             }
 
             this.placeholder = true;
-            this.placeholderMessage = response?.message || 'Falha ao carregar dados administrativos.';
+            this.placeholderMessage = response?.message || 'Falha ao carregar os dados.';
             this.rows = [];
             this.filteredRows = [];
             this.totalItems = 0;
@@ -417,45 +417,45 @@ export class AdminResourcePageComponent {
       if (this.resource === 'accounts') {
         return {
           ...row,
-          status_label: this.accountStatusLabel(row.status),
-          plan_name: this.planName(row.plan_id),
-          storage_limit_label: this.formatStorage(row.storage_limit_mb),
-          storage_used_label: this.formatStorage(row.storage_used_mb),
-          expiration_date_label: this.formatDate(row.expiration_date),
-          active_label: this.activityLabel(row.active)
+          status_display: this.accountStatusLabel(row.status),
+          plan_display: this.planName(row.plan_id),
+          storage_limit_display: this.formatStorage(row.storage_limit_mb),
+          storage_used_display: this.formatStorage(row.storage_used_mb),
+          expiration_display: this.formatDate(row.expiration_date),
+          active_display: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'plans') {
         return {
           ...row,
-          price_label: this.formatCurrency(row.price),
-          max_storage_label: this.formatStorage(row.max_storage_mb),
-          active_label: this.activityLabel(row.active)
+          price_display: this.formatCurrency(row.price),
+          max_storage_display: this.formatStorage(row.max_storage_mb),
+          active_display: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'modules') {
         return {
           ...row,
-          active_label: this.activityLabel(row.active)
+          active_display: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'masterUsers') {
         return {
           ...row,
-          role_label: this.roleLabel(row.role),
-          active_label: this.activityLabel(row.active)
+          role_display: this.roleLabel(row.role),
+          active_display: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'accountModules') {
         return {
           ...row,
-          account_name: row.account_name || this.accountName(row.account_id),
-          module_name: row.module_name || this.moduleName(row.module_code),
-          active_label: this.activityLabel(row.active)
+          account_display: row.account_name || this.accountName(row.account_id),
+          module_display: row.module_name || this.moduleName(row.module_code),
+          active_display: this.activityLabel(row.active)
         };
       }
 
@@ -478,8 +478,12 @@ export class AdminResourcePageComponent {
     return `${new Intl.NumberFormat('pt-BR').format(Number(value ?? 0))} MB`;
   }
 
+  private toBoolean(value: any): boolean {
+    return value === true || value === 1 || value === '1' || String(value).toLowerCase() === 'true';
+  }
+
   private activityLabel(value: any): string {
-    return value ? '● Ativo' : '○ Inativo';
+    return this.toBoolean(value) ? '● Ativo' : '○ Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -515,7 +519,7 @@ export class AdminResourcePageComponent {
   }
 
   openCreateDialog(): void {
-    this.ensureSupportOptionsLoaded();
+    this.loadSupportOptions();
     this.dialogMode = 'create';
     this.editingRow = null;
     this.createForm = this.buildForm();
@@ -524,7 +528,7 @@ export class AdminResourcePageComponent {
   }
 
   openEditDialog(row: any): void {
-    this.ensureSupportOptionsLoaded();
+    this.loadSupportOptions();
     this.dialogMode = 'edit';
     this.editingRow = row;
     this.createForm = this.buildForm();
@@ -538,7 +542,7 @@ export class AdminResourcePageComponent {
   }
 
   openDuplicateDialog(row: any): void {
-    this.ensureSupportOptionsLoaded();
+    this.loadSupportOptions();
     this.dialogMode = 'duplicate';
     this.editingRow = row;
     this.createForm = this.buildForm();
@@ -577,7 +581,7 @@ export class AdminResourcePageComponent {
               return;
             }
 
-            this.dialogMessage = response.message || 'Falha ao salvar registro.';
+            this.dialogMessage = response.message || 'Falha ao salvar o registro.';
             this.pushToast('error', 'Falha ao salvar', this.dialogMessage);
             return;
           }
@@ -622,7 +626,7 @@ export class AdminResourcePageComponent {
             }
 
             this.placeholder = true;
-            this.placeholderMessage = response.message || 'Falha ao excluir registro.';
+            this.placeholderMessage = response.message || 'Falha ao excluir o registro.';
             this.pushToast('error', 'Falha ao excluir', this.placeholderMessage);
             return;
           }
@@ -718,7 +722,7 @@ export class AdminResourcePageComponent {
 
   disabledReason(row: any): string {
     if (this.resource === 'masterUsers' && this.loginService.getLocalToken()?.user?.id === row?.id) {
-      return 'Você não pode remover sua própria sessão master.';
+      return 'Você não pode remover a sua própria sessão master.';
     }
     if (this.resource === 'modules' && ['DIARY', 'PRODUCTION', 'AUDIT'].includes(String(row?.code || '').toUpperCase())) {
       return 'Os módulos base da plataforma não devem ser removidos.';
@@ -867,7 +871,7 @@ export class AdminResourcePageComponent {
         database_url: row.database_url,
         storage_limit_mb: row.storage_limit_mb,
         expiration_date: row.expiration_date,
-        active: row.active
+        active: this.toBoolean(row.active)
       };
     }
 
@@ -881,7 +885,7 @@ export class AdminResourcePageComponent {
         max_users: row.max_users,
         max_works: row.max_works,
         max_storage_mb: row.max_storage_mb,
-        active: row.active
+        active: this.toBoolean(row.active)
       };
     }
 
@@ -891,7 +895,7 @@ export class AdminResourcePageComponent {
         code: mode === 'duplicate' ? `${row.code}_COPY` : row.code,
         name: mode === 'duplicate' ? `${row.name} Cópia` : row.name,
         description: row.description,
-        active: row.active
+        active: this.toBoolean(row.active)
       };
     }
 
@@ -904,7 +908,7 @@ export class AdminResourcePageComponent {
         password: '',
         phone: row.phone,
         role: row.role,
-        active: row.active ?? true
+        active: this.toBoolean(row.active ?? true)
       };
     }
 
@@ -913,7 +917,7 @@ export class AdminResourcePageComponent {
         id: mode === 'edit' ? row.id : null,
         account_id: row.account_id,
         module_code: row.module_code,
-        active: row.active
+        active: this.toBoolean(row.active)
       };
     }
 

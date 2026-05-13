@@ -126,14 +126,17 @@
 
 .ops-grid-shell {
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   border-radius: 16px;
   border: 1px solid rgba(148, 163, 184, 0.08);
   background: rgba(8, 22, 41, 0.55);
+  scrollbar-color: rgba(91, 126, 186, 0.9) transparent;
+  scrollbar-width: thin;
 }
 
 :host ::ng-deep .ops-grid-shell .e-grid {
-  width: 100% !important;
+  min-width: 100% !important;
   border: none !important;
   background: transparent !important;
 }
@@ -144,9 +147,58 @@
   background: transparent !important;
 }
 
+:host ::ng-deep .ops-grid-shell .e-gridcontent {
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-content {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-headercontent {
+  overflow-x: hidden !important;
+}
+
 :host ::ng-deep .ops-grid-shell .e-headercell,
 :host ::ng-deep .ops-grid-shell .e-rowcell {
   white-space: nowrap !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-grid .e-headercelldiv,
+:host ::ng-deep .ops-grid-shell .e-grid .e-rowcell {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:host ::ng-deep .ops-grid-shell .e-grid .e-headercell {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-grid .e-rowcell {
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  line-height: 1.3 !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-headertext {
+  color: #dbeafe !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  text-transform: none !important;
+  font-size: 0.85rem !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-rowcell {
+  color: #f8fbff !important;
+  font-size: 0.95rem !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-table {
+  width: max-content !important;
+  min-width: 100% !important;
 }
 
 .ops-state {
