@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
@@ -32,6 +32,7 @@ export class AdminOpsPageComponent {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private loginService: LoginService,
     private adminDataService: AdminDataService,
     private cdr: ChangeDetectorRef
@@ -56,7 +57,7 @@ export class AdminOpsPageComponent {
   load(): void {
     const token = this.loginService.getToken();
     if (!token) {
-      this.errorMessage = 'Sessão master não encontrada.';
+      this.redirectToLogin();
       this.loading = false;
       this.flushView();
       return;
@@ -73,7 +74,12 @@ export class AdminOpsPageComponent {
       .subscribe({
         next: (payload) => this.mapPayload(payload),
         error: (error) => {
-          this.errorMessage = error?.error?.message || 'Falha ao carregar dados operacionais.';
+          const message = error?.error?.message || 'Falha ao carregar dados operacionais.';
+          if (this.isAuthenticationFailure(message)) {
+            this.redirectToLogin();
+            return;
+          }
+          this.errorMessage = message;
           this.flushView();
         }
       });
@@ -98,7 +104,12 @@ export class AdminOpsPageComponent {
       .subscribe({
         next: () => this.load(),
         error: (error) => {
-          this.errorMessage = error?.error?.message || 'Falha ao executar a ação administrativa.';
+          const message = error?.error?.message || 'Falha ao executar a ação administrativa.';
+          if (this.isAuthenticationFailure(message)) {
+            this.redirectToLogin();
+            return;
+          }
+          this.errorMessage = message;
           this.flushView();
         }
       });
@@ -475,5 +486,15 @@ export class AdminOpsPageComponent {
 
   private formatStorage(value: any): string {
     return `${new Intl.NumberFormat('pt-BR').format(Number(value ?? 0))} MB`;
+  }
+
+  private isAuthenticationFailure(message?: string): boolean {
+    const normalized = String(message ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return normalized.includes('autentic') || normalized.includes('sessao') || normalized.includes('token');
+  }
+
+  private redirectToLogin(): void {
+    this.loginService.clearToken();
+    void this.router.navigate(['/login']);
   }
 }
