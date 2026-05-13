@@ -1,7 +1,7 @@
 .resource-page {
   display: grid;
-  gap: 18px;
-  padding-bottom: 18px;
+  gap: 16px;
+  padding-bottom: 16px;
 }
 
 .toast-stack {
@@ -34,17 +34,9 @@
   color: var(--orbax-text-soft);
 }
 
-.toast-item.success {
-  border-color: rgba(39, 215, 150, 0.35);
-}
-
-.toast-item.error {
-  border-color: rgba(239, 68, 68, 0.35);
-}
-
-.toast-item.info {
-  border-color: rgba(47, 111, 255, 0.35);
-}
+.toast-item.success { border-color: rgba(39, 215, 150, 0.35); }
+.toast-item.error { border-color: rgba(239, 68, 68, 0.35); }
+.toast-item.info { border-color: rgba(47, 111, 255, 0.35); }
 
 .toast-close {
   border: none;
@@ -54,63 +46,69 @@
   cursor: pointer;
 }
 
-.resource-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 280px;
-  gap: 18px;
-}
-
-.resource-header,
 .resource-body {
-  padding: 22px;
+  padding: 18px 20px 16px;
 }
 
-.resource-header {
+.resource-topline {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 18px;
 }
 
-.resource-header h3 {
-  margin: 0 0 8px;
-  font-size: 1.5rem;
+.resource-meta {
+  display: grid;
+  gap: 10px;
 }
 
-.resource-header p {
-  margin: 0;
+.resource-count {
   color: var(--orbax-text-soft);
+  font-size: 0.95rem;
+}
+
+.quick-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(8, 23, 43, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: var(--orbax-text-soft);
+  font-size: 0.88rem;
+}
+
+.metric-pill strong {
+  color: var(--orbax-text);
 }
 
 .resource-toolbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.resource-toolbar-right {
-  display: flex;
-  align-items: center;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-.resource-count {
-  color: var(--orbax-text-soft);
-  font-size: 0.9rem;
+  margin-bottom: 14px;
 }
 
 .resource-search {
-  width: min(320px, 100%);
+  flex: 1 1 320px;
+  max-width: 360px;
 }
 
 .resource-controls {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 220px));
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .control-item {
@@ -121,7 +119,7 @@
 .control-item label {
   color: var(--orbax-text-soft);
   font-size: 0.82rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
 }
 
 :host ::ng-deep .resource-search .e-input-group,
@@ -142,20 +140,55 @@
   color: var(--orbax-text-soft) !important;
 }
 
-:host ::ng-deep .e-grid {
-  border-radius: 16px;
-  overflow: hidden;
-}
-
 .grid-shell {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding-bottom: 6px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(8, 22, 41, 0.55);
 }
 
 :host ::ng-deep .grid-shell .e-grid {
-  min-width: 1460px;
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .grid-shell .e-gridheader,
+:host ::ng-deep .grid-shell .e-gridcontent,
+:host ::ng-deep .grid-shell .e-content {
+  background: transparent !important;
+}
+
+:host ::ng-deep .grid-shell .e-gridcontent,
+:host ::ng-deep .grid-shell .e-content {
+  overflow-y: auto !important;
+}
+
+:host ::ng-deep .grid-shell .e-headercontent,
+:host ::ng-deep .grid-shell .e-content {
+  scrollbar-color: rgba(91, 126, 186, 0.9) transparent;
+  scrollbar-width: thin;
+}
+
+:host ::ng-deep .grid-shell .e-headercell,
+:host ::ng-deep .grid-shell .e-rowcell {
+  white-space: nowrap !important;
+}
+
+:host ::ng-deep .grid-shell .e-headertext {
+  color: #dbeafe !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em;
+  text-transform: none !important;
+}
+
+:host ::ng-deep .grid-shell .e-rowcell {
+  color: #f8fbff !important;
+}
+
+:host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
+  background: rgba(47, 111, 255, 0.08) !important;
 }
 
 .loading-state,
@@ -186,20 +219,17 @@
 .skeleton-line.w-55 { width: 55%; }
 .skeleton-line.w-70 { width: 70%; }
 
-.placeholder-state p {
+.placeholder-state p,
+.empty-grid-state p {
   color: var(--orbax-text-soft);
 }
 
 .empty-grid-state {
-  min-height: 240px;
+  min-height: 220px;
   display: grid;
   align-content: center;
   justify-items: start;
   gap: 10px;
-}
-
-.empty-grid-state p {
-  color: var(--orbax-text-soft);
 }
 
 .row-actions {
@@ -240,7 +270,7 @@
 }
 
 .pager-bar {
-  margin-top: 18px;
+  margin-top: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -250,48 +280,6 @@
 .pager-info {
   color: var(--orbax-text-soft);
   font-size: 0.9rem;
-}
-
-.resource-side {
-  padding: 22px;
-  align-self: start;
-  display: grid;
-  gap: 16px;
-}
-
-.resource-side h4 {
-  margin: 0;
-  font-size: 1.08rem;
-}
-
-.side-metric {
-  display: grid;
-  gap: 4px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: rgba(7, 18, 34, 0.28);
-}
-
-.side-metric span,
-.side-notes span {
-  color: var(--orbax-text-soft);
-  font-size: 0.82rem;
-  letter-spacing: 0.08em;
-}
-
-.side-metric strong {
-  font-size: 1.5rem;
-}
-
-.side-notes {
-  display: grid;
-  gap: 8px;
-}
-
-.side-notes p {
-  margin: 0;
-  color: var(--orbax-text-soft);
-  line-height: 1.5;
 }
 
 .primary-action {
@@ -369,25 +357,12 @@
   100% { background-position: -200% 0; }
 }
 
-@media (max-width: 860px) {
-  .resource-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .resource-header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .resource-toolbar {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .resource-toolbar-right,
+@media (max-width: 980px) {
+  .resource-topline,
+  .resource-toolbar,
   .pager-bar {
-    align-items: stretch;
     flex-direction: column;
+    align-items: stretch;
   }
 
   .resource-controls {
@@ -395,10 +370,17 @@
   }
 
   .resource-search {
-    width: 100%;
+    max-width: none;
   }
+}
 
+@media (max-width: 640px) {
   .two-cols {
     grid-template-columns: 1fr;
+  }
+
+  .quick-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
 }

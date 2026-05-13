@@ -1,7 +1,7 @@
 .dashboard-page {
   display: grid;
-  gap: 18px;
-  padding-bottom: 18px;
+  gap: 16px;
+  padding-bottom: 16px;
 }
 
 .dashboard-loading {
@@ -32,7 +32,7 @@
 .chart-grid,
 .data-grid {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .stats-grid {
@@ -44,7 +44,7 @@
 }
 
 .data-grid {
-  grid-template-columns: 1.2fr 1.05fr 0.95fr;
+  grid-template-columns: 1.15fr 1fr 0.85fr;
 }
 
 .stat-card,
@@ -52,7 +52,7 @@
 .data-card,
 .alerts-card,
 .footer-strip {
-  padding: 20px;
+  padding: 18px;
 }
 
 .stat-card {
@@ -134,13 +134,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .chart-header h3,
 .data-card-header h3 {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.15rem;
 }
 
 .data-card-header button {
@@ -150,13 +150,14 @@
   border-radius: 12px;
   min-height: 38px;
   padding: 0 14px;
+  cursor: pointer;
 }
 
 .donut-layout {
   display: flex;
   align-items: center;
-  gap: 24px;
-  min-height: 228px;
+  gap: 20px;
+  min-height: 190px;
 }
 
 .donut {
@@ -201,14 +202,14 @@
 }
 
 .trend-card .trend-visual {
-  min-height: 260px;
+  min-height: 220px;
   display: grid;
   align-items: end;
 }
 
 .trend-card svg {
   width: 100%;
-  height: 240px;
+  height: 210px;
 }
 
 .trend-line {
@@ -235,7 +236,7 @@
 
 .alerts-list {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .alert-row {
@@ -295,12 +296,12 @@
 .footer-strip {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   align-items: center;
 }
 
 .footer-stat {
-  padding: 8px 14px;
+  padding: 4px 12px;
   border-right: 1px solid rgba(148, 163, 184, 0.1);
 }
 

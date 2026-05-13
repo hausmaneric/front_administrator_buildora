@@ -182,17 +182,17 @@ export class AdminResourcePageComponent {
           sortField: 'id',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Código', width: 130 },
-            { field: 'name', headerText: 'Conta', width: 220 },
-            { field: 'document', headerText: 'Documento', width: 150 },
-            { field: 'email', headerText: 'E-mail', width: 220 },
-            { field: 'phone', headerText: 'Telefone', width: 160 },
-            { field: 'status_label', headerText: 'Status', width: 120 },
-            { field: 'plan_name', headerText: 'Plano', width: 180 },
+            { field: 'code', headerText: 'Código', width: 140 },
+            { field: 'name', headerText: 'Nome da conta', width: 260 },
+            { field: 'document', headerText: 'Documento', width: 180 },
+            { field: 'email', headerText: 'E-mail', width: 260 },
+            { field: 'phone', headerText: 'Telefone', width: 170 },
+            { field: 'status_label', headerText: 'Status', width: 150 },
+            { field: 'plan_name', headerText: 'Plano', width: 220 },
             { field: 'storage_limit_label', headerText: 'Limite de armazenamento', width: 190 },
-            { field: 'storage_used_label', headerText: 'Uso atual', width: 150 },
-            { field: 'expiration_date_label', headerText: 'Expiração', width: 140 },
-            { field: 'active_label', headerText: 'Ativo', width: 110 }
+            { field: 'storage_used_label', headerText: 'Armazenamento usado', width: 190 },
+            { field: 'expiration_date_label', headerText: 'Expiração', width: 150 },
+            { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
       case 'plans':
@@ -205,13 +205,13 @@ export class AdminResourcePageComponent {
           supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
-            { field: 'description', headerText: 'Descrição', width: 260 },
-            { field: 'price_label', headerText: 'Preço', width: 140 },
-            { field: 'max_companies', headerText: 'Máx. empresas', width: 130 },
-            { field: 'max_users', headerText: 'Máx. usuários', width: 130 },
-            { field: 'max_works', headerText: 'Máx. obras', width: 120 },
-            { field: 'max_storage_label', headerText: 'Armazenamento', width: 160 },
-            { field: 'active_label', headerText: 'Ativo', width: 110 }
+            { field: 'description', headerText: 'Descrição', width: 320 },
+            { field: 'price_label', headerText: 'Preço', width: 150 },
+            { field: 'max_companies', headerText: 'Máx. empresas', width: 140 },
+            { field: 'max_users', headerText: 'Máx. usuários', width: 140 },
+            { field: 'max_works', headerText: 'Máx. obras', width: 130 },
+            { field: 'max_storage_label', headerText: 'Armazenamento', width: 170 },
+            { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
       case 'modules':
@@ -223,10 +223,10 @@ export class AdminResourcePageComponent {
           sortField: 'id',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Código', width: 120 },
+            { field: 'code', headerText: 'Código', width: 140 },
             { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'description', headerText: 'Descrição', width: 280 },
-            { field: 'active_label', headerText: 'Ativo', width: 110 }
+            { field: 'description', headerText: 'Descrição', width: 340 },
+            { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
       case 'masterUsers':
@@ -239,11 +239,11 @@ export class AdminResourcePageComponent {
           supportsPaging: false,
           columns: [
             { field: 'name', headerText: 'Nome', width: 220 },
-            { field: 'login', headerText: 'Login', width: 150 },
-            { field: 'email', headerText: 'E-mail', width: 220 },
-            { field: 'role_label', headerText: 'Perfil', width: 140 },
-            { field: 'phone', headerText: 'Telefone', width: 150 },
-            { field: 'active_label', headerText: 'Ativo', width: 110 }
+            { field: 'login', headerText: 'Login', width: 160 },
+            { field: 'email', headerText: 'E-mail', width: 260 },
+            { field: 'role_label', headerText: 'Perfil', width: 150 },
+            { field: 'phone', headerText: 'Telefone', width: 170 },
+            { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
       case 'accountModules':
@@ -255,10 +255,10 @@ export class AdminResourcePageComponent {
           sortField: 'id',
           supportsPaging: true,
           columns: [
-            { field: 'account_name', headerText: 'Conta', width: 220 },
-            { field: 'module_code', headerText: 'Módulo', width: 140 },
-            { field: 'module_name', headerText: 'Nome do módulo', width: 220 },
-            { field: 'active_label', headerText: 'Ativo', width: 110 }
+            { field: 'account_name', headerText: 'Conta', width: 260 },
+            { field: 'module_code', headerText: 'Código do módulo', width: 180 },
+            { field: 'module_name', headerText: 'Módulo', width: 260 },
+            { field: 'active_label', headerText: 'Situação', width: 130 }
           ]
         };
       default:
@@ -292,7 +292,7 @@ export class AdminResourcePageComponent {
     if (this.resource === 'accountModules') {
       this.adminDataService.accounts(token).subscribe({
         next: (response) => {
-          this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} - ${item.name}` }));
+          this.accountOptions = this.extractItems(response.data).map((item: any) => ({ id: item.id, text: `${item.code} · ${item.name}` }));
           if (this.rows.length) {
             this.filteredRows = this.mapRowsForDisplay(this.rows);
             this.cdr.detectChanges();
@@ -301,7 +301,7 @@ export class AdminResourcePageComponent {
       });
       this.adminDataService.modules(token).subscribe({
         next: (response) => {
-          this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} - ${item.name}` }));
+          this.moduleOptions = this.extractItems(response.data).map((item: any) => ({ id: item.code, text: `${item.code} · ${item.name}` }));
           if (this.rows.length) {
             this.filteredRows = this.mapRowsForDisplay(this.rows);
             this.cdr.detectChanges();
@@ -380,14 +380,20 @@ export class AdminResourcePageComponent {
             this.currentPage = 1;
           }
 
-          this.cdr.detectChanges();
+          queueMicrotask(() => {
+            window.dispatchEvent(new Event('resize'));
+            this.cdr.detectChanges();
+          });
         },
         error: (error: any) => {
           this.placeholder = true;
           this.placeholderMessage = error?.error?.message || 'Falha ao carregar dados administrativos.';
           this.rows = [];
           this.filteredRows = [];
-          this.cdr.detectChanges();
+          queueMicrotask(() => {
+            window.dispatchEvent(new Event('resize'));
+            this.cdr.detectChanges();
+          });
         }
       });
   }
@@ -402,7 +408,7 @@ export class AdminResourcePageComponent {
           storage_limit_label: this.formatStorage(row.storage_limit_mb),
           storage_used_label: this.formatStorage(row.storage_used_mb),
           expiration_date_label: this.formatDate(row.expiration_date),
-          active_label: this.booleanLabel(row.active)
+          active_label: this.activityLabel(row.active)
         };
       }
 
@@ -411,14 +417,14 @@ export class AdminResourcePageComponent {
           ...row,
           price_label: this.formatCurrency(row.price),
           max_storage_label: this.formatStorage(row.max_storage_mb),
-          active_label: this.booleanLabel(row.active)
+          active_label: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'modules') {
         return {
           ...row,
-          active_label: this.booleanLabel(row.active)
+          active_label: this.activityLabel(row.active)
         };
       }
 
@@ -426,7 +432,7 @@ export class AdminResourcePageComponent {
         return {
           ...row,
           role_label: this.roleLabel(row.role),
-          active_label: this.booleanLabel(row.active)
+          active_label: this.activityLabel(row.active)
         };
       }
 
@@ -435,7 +441,7 @@ export class AdminResourcePageComponent {
           ...row,
           account_name: row.account_name || this.accountName(row.account_id),
           module_name: row.module_name || this.moduleName(row.module_code),
-          active_label: this.booleanLabel(row.active)
+          active_label: this.activityLabel(row.active)
         };
       }
 
@@ -464,8 +470,8 @@ export class AdminResourcePageComponent {
     return `${new Intl.NumberFormat('pt-BR').format(number)} MB`;
   }
 
-  private booleanLabel(value: any): string {
-    return value ? 'Sim' : 'Não';
+  private activityLabel(value: any): string {
+    return value ? '● Ativo' : '○ Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -479,9 +485,9 @@ export class AdminResourcePageComponent {
 
   private accountStatusLabel(value: any): string {
     const status = Number(value ?? 0);
-    if (status === 1) return 'Ativa';
-    if (status === 2) return 'Suspensa';
-    if (status === 3) return 'Bloqueada';
+    if (status === 1) return '● Ativa';
+    if (status === 2) return '● Suspensa';
+    if (status === 3) return '● Bloqueada';
     return String(value ?? '-');
   }
 
@@ -497,7 +503,7 @@ export class AdminResourcePageComponent {
 
   private moduleName(moduleCode: any): string {
     const option = this.moduleOptions.find((item) => String(item.id) === String(moduleCode));
-    return option?.text?.split(' - ').slice(1).join(' - ') || `Módulo ${moduleCode ?? '-'}`;
+    return option?.text?.split(' · ').slice(1).join(' · ') || `Módulo ${moduleCode ?? '-'}`;
   }
 
   openCreateDialog(): void {
@@ -704,7 +710,7 @@ export class AdminResourcePageComponent {
   }
 
   exportJson(): void {
-    this.downloadBlob('application/json', JSON.stringify(this.filteredRows, null, 2), `${this.resource}-page-${this.currentPage}.json`);
+    this.downloadBlob('application/json', JSON.stringify(this.filteredRows, null, 2), `${this.resource}-pagina-${this.currentPage}.json`);
     this.pushToast('info', 'Exportação JSON', 'Página atual exportada com sucesso.');
   }
 
@@ -717,7 +723,7 @@ export class AdminResourcePageComponent {
         .join(',')
     );
     const csv = [headers.join(','), ...rows].join('\n');
-    this.downloadBlob('text/csv;charset=utf-8', csv, `${this.resource}-page-${this.currentPage}.csv`);
+    this.downloadBlob('text/csv;charset=utf-8', csv, `${this.resource}-pagina-${this.currentPage}.csv`);
     this.pushToast('info', 'Exportação CSV', 'Página atual exportada com sucesso.');
   }
 
@@ -864,7 +870,7 @@ export class AdminResourcePageComponent {
     if (this.resource === 'plans') {
       return {
         id: mode === 'edit' ? row.id : null,
-        name: mode === 'duplicate' ? `${row.name} Copy` : row.name,
+        name: mode === 'duplicate' ? `${row.name} Cópia` : row.name,
         description: row.description,
         price: row.price,
         max_companies: row.max_companies,
@@ -879,7 +885,7 @@ export class AdminResourcePageComponent {
       return {
         id: mode === 'edit' ? row.id : null,
         code: mode === 'duplicate' ? `${row.code}_COPY` : row.code,
-        name: mode === 'duplicate' ? `${row.name} Copy` : row.name,
+        name: mode === 'duplicate' ? `${row.name} Cópia` : row.name,
         description: row.description,
         active: row.active
       };

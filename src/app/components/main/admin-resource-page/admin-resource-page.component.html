@@ -13,16 +13,6 @@
     </div>
   }
 
-  <header class="resource-header orb-card">
-    <div>
-      <h3>{{ title }}</h3>
-      <p>{{ subtitle }}</p>
-    </div>
-    @if (!placeholder) {
-      <button ejs-button class="primary-action" type="button" (click)="openCreateDialog()">Novo cadastro</button>
-    }
-  </header>
-
   @if (loading) {
     <article class="resource-body orb-card loading-state">
       <div class="loading-skeleton">
@@ -38,106 +28,92 @@
       <p>{{ placeholderMessage }}</p>
     </article>
   } @else {
-    <div class="resource-layout">
-      <article class="resource-body orb-card">
-        <div class="resource-toolbar">
+    <article class="resource-body orb-card">
+      <div class="resource-topline">
+        <div class="resource-meta">
           <div class="resource-count">{{ totalRowsLabel() }}</div>
-          <div class="resource-toolbar-right">
-            <div class="resource-search">
-              <ejs-textbox cssClass="orb-input" placeholder="Buscar registros..." [value]="searchTerm" (input)="searchTerm = $any($event.target).value"></ejs-textbox>
-            </div>
-            <button ejs-button cssClass="dialog-secondary" type="button" (click)="clearSearch()">Limpar</button>
-            <button ejs-button cssClass="dialog-primary" type="button" (click)="applySearch()">Buscar</button>
-            <button ejs-button cssClass="dialog-secondary" type="button" (click)="exportCsv()">Exportar CSV</button>
-            <button ejs-button cssClass="dialog-secondary" type="button" (click)="exportJson()">Exportar JSON</button>
+          <div class="quick-metrics">
+            <span class="metric-pill">Total: <strong>{{ totalItems }}</strong></span>
+            <span class="metric-pill">Página: <strong>{{ currentPage }}</strong></span>
+            <span class="metric-pill">Mostrando: <strong>{{ rows.length }}</strong></span>
+            <span class="metric-pill">Busca: <strong>{{ appliedSearch || 'Sem filtro' }}</strong></span>
           </div>
+        </div>
+        <div class="resource-topline-actions">
+          <button ejs-button class="primary-action" type="button" (click)="openCreateDialog()">Novo cadastro</button>
+        </div>
+      </div>
+
+      <div class="resource-toolbar">
+        <div class="resource-search">
+          <ejs-textbox cssClass="orb-input" placeholder="Buscar registros..." [value]="searchTerm" (input)="searchTerm = $any($event.target).value"></ejs-textbox>
+        </div>
+        <button ejs-button cssClass="dialog-secondary" type="button" (click)="clearSearch()">Limpar</button>
+        <button ejs-button cssClass="dialog-primary" type="button" (click)="applySearch()">Buscar</button>
+        <button ejs-button cssClass="dialog-secondary" type="button" (click)="exportCsv()">Exportar CSV</button>
+        <button ejs-button cssClass="dialog-secondary" type="button" (click)="exportJson()">Exportar JSON</button>
+      </div>
+
+      <div class="resource-controls">
+        <div class="control-item">
+          <label>Ordenar por</label>
+          <ejs-dropdownlist
+            [dataSource]="sortOptions"
+            [fields]="{ text: 'text', value: 'id' }"
+            [value]="sortField"
+            (change)="changeSortField($any($event).value)">
+          </ejs-dropdownlist>
+        </div>
+        <div class="control-item">
+          <label>Direção</label>
+          <ejs-dropdownlist
+            [dataSource]="sortDirectionOptions"
+            [fields]="{ text: 'text', value: 'id' }"
+            [value]="sortDirection"
+            (change)="changeSortDirection($any($event).value)">
+          </ejs-dropdownlist>
+        </div>
+        <div class="control-item">
+          <label>Tamanho da página</label>
+          <ejs-dropdownlist
+            [dataSource]="pageSizeOptions"
+            [fields]="{ text: 'text', value: 'id' }"
+            [value]="pageSize"
+            (change)="changePageSize($any($event).value)">
+          </ejs-dropdownlist>
+        </div>
+      </div>
+
+      @if (filteredRows.length) {
+        <div class="grid-shell">
+          <ejs-grid [dataSource]="filteredRows" [allowResizing]="true" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
+            @for (column of columns; track column.field) {
+              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+            }
+            <e-column headerText="Ações" [width]="250">
+              <ng-template #template let-data>
+                <div class="row-actions">
+                  <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
+                  <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
+                  <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
+                </div>
+              </ng-template>
+            </e-column>
+          </ejs-grid>
         </div>
 
-        <div class="resource-controls">
-          <div class="control-item">
-            <label>Ordenar por</label>
-            <ejs-dropdownlist
-              [dataSource]="sortOptions"
-              [fields]="{ text: 'text', value: 'id' }"
-              [value]="sortField"
-              (change)="changeSortField($any($event).value)">
-            </ejs-dropdownlist>
-          </div>
-          <div class="control-item">
-            <label>Direção</label>
-            <ejs-dropdownlist
-              [dataSource]="sortDirectionOptions"
-              [fields]="{ text: 'text', value: 'id' }"
-              [value]="sortDirection"
-              (change)="changeSortDirection($any($event).value)">
-            </ejs-dropdownlist>
-          </div>
-          <div class="control-item">
-            <label>Página</label>
-            <ejs-dropdownlist
-              [dataSource]="pageSizeOptions"
-              [fields]="{ text: 'text', value: 'id' }"
-              [value]="pageSize"
-              (change)="changePageSize($any($event).value)">
-            </ejs-dropdownlist>
-          </div>
+        <div class="pager-bar">
+          <button ejs-button cssClass="dialog-secondary" type="button" [disabled]="offset <= 0" (click)="previousPage()">Anterior</button>
+          <div class="pager-info">Página {{ currentPage }} · {{ rows.length }} itens nesta página</div>
+          <button ejs-button cssClass="dialog-primary" type="button" [disabled]="!hasNext" (click)="nextPage()">Próxima</button>
         </div>
-
-        @if (filteredRows.length) {
-          <div class="grid-shell">
-            <ejs-grid [dataSource]="filteredRows" [allowResizing]="true" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-              @for (column of columns; track column.field) {
-                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-              }
-              <e-column headerText="Ações" [width]="240">
-                <ng-template #template let-data>
-                  <div class="row-actions">
-                    <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
-                    <button ejs-button cssClass="row-action duplicate" type="button" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">Duplicar</button>
-                    <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data)" (click)="deleteRow(data)">Remover</button>
-                  </div>
-                </ng-template>
-              </e-column>
-            </ejs-grid>
-          </div>
-
-          <div class="pager-bar">
-            <button ejs-button cssClass="dialog-secondary" type="button" [disabled]="offset <= 0" (click)="previousPage()">Anterior</button>
-            <div class="pager-info">Página {{ currentPage }} · {{ rows.length }} itens nesta página</div>
-            <button ejs-button cssClass="dialog-primary" type="button" [disabled]="!hasNext" (click)="nextPage()">Próxima</button>
-          </div>
-        } @else {
-          <div class="empty-grid-state">
-            <strong>Nenhum registro encontrado</strong>
-            <p>Ajuste a busca ou crie um novo cadastro para este módulo.</p>
-          </div>
-        }
-      </article>
-
-      <aside class="resource-side orb-card">
-        <h4>Visão rápida</h4>
-        <div class="side-metric">
-          <span>Registros totais</span>
-          <strong>{{ totalItems }}</strong>
+      } @else {
+        <div class="empty-grid-state">
+          <strong>Nenhum registro encontrado</strong>
+          <p>Ajuste a busca ou crie um novo cadastro para este módulo.</p>
         </div>
-        <div class="side-metric">
-          <span>Registros nesta página</span>
-          <strong>{{ rows.length }}</strong>
-        </div>
-        <div class="side-metric">
-          <span>Página atual</span>
-          <strong>{{ currentPage }}</strong>
-        </div>
-        <div class="side-metric">
-          <span>Busca aplicada</span>
-          <strong>{{ appliedSearch || 'Sem filtro' }}</strong>
-        </div>
-        <div class="side-notes">
-          <span>Fluxo atual</span>
-          <p>Leitura, criação, edição, duplicação e exclusão integradas à API master do Obrax.</p>
-        </div>
-      </aside>
-    </div>
+      }
+    </article>
   }
 
   <ejs-dialog #createDialog [visible]="false" [isModal]="true" width="760px" [header]="dialogTitle()">

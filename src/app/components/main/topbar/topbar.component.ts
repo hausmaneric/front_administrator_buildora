@@ -39,6 +39,21 @@ export class TopbarComponent {
     this.syncTitle();
   }
 
+  focusPageSearch(): void {
+    const input = document.querySelector('input[placeholder="Buscar registros..."]') as HTMLInputElement | null;
+    if (input) {
+      input.focus();
+      input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    this.router.navigate(['/main/accounts']);
+  }
+
+  openNotifications(): void {
+    this.router.navigate(['/main/logs']);
+  }
+
   private syncTitle(): void {
     const current = this.router.routerState.snapshot.root.firstChild?.firstChild;
     this.title = current?.data?.['title'] ?? 'Dashboard';

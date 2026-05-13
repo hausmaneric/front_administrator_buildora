@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { GridModule, SortService } from '@syncfusion/ej2-angular-grids';
 import { finalize } from 'rxjs';
 import { AdminDashboardViewModel, SummaryCard } from '../../../models/admin-dashboard';
@@ -29,21 +30,24 @@ export class DashboardComponent {
   };
 
   accessColumns = [
-    { field: 'company', headerText: 'Empresa', width: 180 },
-    { field: 'user', headerText: 'Usuário', width: 170 },
-    { field: 'dateTime', headerText: 'Data/Hora', width: 130 },
-    { field: 'ip', headerText: 'IP', width: 120 }
+    { field: 'company', headerText: 'Empresa', width: 220 },
+    { field: 'user', headerText: 'Usuário', width: 220 },
+    { field: 'dateTime', headerText: 'Data e hora', width: 150 },
+    { field: 'ip', headerText: 'IP', width: 140 },
+    { field: 'badge', headerText: 'Conta', width: 150 }
   ];
 
   logColumns = [
-    { field: 'title', headerText: 'Evento', width: 220 },
-    { field: 'dateTime', headerText: 'Data/Hora', width: 130 },
-    { field: 'type', headerText: 'Tipo', width: 90 }
+    { field: 'title', headerText: 'Evento', width: 250 },
+    { field: 'dateTime', headerText: 'Data e hora', width: 150 },
+    { field: 'type', headerText: 'Categoria', width: 140 },
+    { field: 'toneLabel', headerText: 'Prioridade', width: 140 }
   ];
 
   constructor(
     private loginService: LoginService,
     private dashboardService: AdminDashboardService,
+    private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -60,7 +64,10 @@ export class DashboardComponent {
       .load(token)
       .pipe(finalize(() => {
         this.loading = false;
-        this.cdr.detectChanges();
+        queueMicrotask(() => {
+          window.dispatchEvent(new Event('resize'));
+          this.cdr.detectChanges();
+        });
       }))
       .subscribe({
         next: (viewModel) => {
@@ -76,6 +83,18 @@ export class DashboardComponent {
 
   trackByTitle(_: number, item: SummaryCard): string {
     return item.title;
+  }
+
+  openSection(section: 'accounts' | 'logs' | 'storage'): void {
+    if (section === 'accounts') {
+      this.router.navigate(['/main/accounts']);
+      return;
+    }
+    if (section === 'logs') {
+      this.router.navigate(['/main/logs']);
+      return;
+    }
+    this.router.navigate(['/main/storage']);
   }
 
   distributionPercent(total: number, value: number): string {
