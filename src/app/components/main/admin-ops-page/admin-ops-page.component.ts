@@ -4,8 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { GridModule } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
-import { forkJoin, Observable } from 'rxjs';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin, Observable } from 'rxjs';
 import { AdminDataService } from '../../../services/admin-data.service';
 import { LoginService } from '../../../services/login.service';
 
@@ -196,13 +195,18 @@ export class AdminOpsPageComponent {
       { label: 'Vencendo', value: `${expiring}`, detail: 'Nos próximos 7 dias', tone: 'warning' },
       { label: 'Vencidas', value: `${expired}`, detail: 'Exigem ação imediata', tone: 'danger' }
     ];
-    this.rows = accounts;
+    this.rows = accounts.map(item => ({
+      name: item.name,
+      code: item.code,
+      email: item.email,
+      expiration_date: this.formatDate(item.expiration_date)
+    }));
     this.applyFilter();
     this.columns = [
-      { field: 'name', headerText: 'Conta', width: 220 },
-      { field: 'code', headerText: 'Código', width: 120 },
-      { field: 'email', headerText: 'Email', width: 220 },
-      { field: 'expiration_date', headerText: 'Vencimento', width: 140 }
+      { field: 'name', headerText: 'Conta', width: 240 },
+      { field: 'code', headerText: 'Código', width: 140 },
+      { field: 'email', headerText: 'E-mail', width: 240 },
+      { field: 'expiration_date', headerText: 'Vencimento', width: 150 }
     ];
   }
 
@@ -212,24 +216,24 @@ export class AdminOpsPageComponent {
     const percent = total ? Math.round((used / total) * 100) : 0;
 
     this.cards = [
-      { label: 'Storage total', value: `${total} MB`, detail: 'Limite consolidado' },
-      { label: 'Storage usado', value: `${used} MB`, detail: `${percent}% do total` },
+      { label: 'Armazenamento total', value: this.formatStorage(total), detail: 'Limite consolidado' },
+      { label: 'Armazenamento usado', value: this.formatStorage(used), detail: `${percent}% do total` },
       { label: 'Contas monitoradas', value: `${accounts.length}`, detail: 'Base master' }
     ];
     this.rows = accounts.map(item => ({
       name: item.name,
       code: item.code,
-      storage_limit_mb: item.storage_limit_mb,
-      storage_used_mb: item.storage_used_mb,
-      usage_percent: item.storage_limit_mb ? Math.round((Number(item.storage_used_mb || 0) / Number(item.storage_limit_mb || 1)) * 100) : 0
+      storage_limit_mb: this.formatStorage(item.storage_limit_mb),
+      storage_used_mb: this.formatStorage(item.storage_used_mb),
+      usage_percent: `${item.storage_limit_mb ? Math.round((Number(item.storage_used_mb || 0) / Number(item.storage_limit_mb || 1)) * 100) : 0}%`
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'name', headerText: 'Conta', width: 220 },
-      { field: 'code', headerText: 'Código', width: 120 },
-      { field: 'storage_limit_mb', headerText: 'Limite MB', width: 120 },
-      { field: 'storage_used_mb', headerText: 'Usado MB', width: 120 },
-      { field: 'usage_percent', headerText: 'Uso %', width: 100 }
+      { field: 'name', headerText: 'Conta', width: 240 },
+      { field: 'code', headerText: 'Código', width: 140 },
+      { field: 'storage_limit_mb', headerText: 'Limite', width: 160 },
+      { field: 'storage_used_mb', headerText: 'Uso atual', width: 160 },
+      { field: 'usage_percent', headerText: 'Uso', width: 100 }
     ];
   }
 
@@ -247,8 +251,8 @@ export class AdminOpsPageComponent {
     this.applyFilter();
     this.columns = [
       { field: 'method', headerText: 'Métodos', width: 140 },
-      { field: 'path', headerText: 'Rota', width: 420 },
-      { field: 'requires_token', headerText: 'Token', width: 90 }
+      { field: 'path', headerText: 'Rota', width: 460 },
+      { field: 'requires_token', headerText: 'Exige token', width: 130 }
     ];
   }
 
@@ -287,20 +291,20 @@ export class AdminOpsPageComponent {
     this.cards = [
       { label: 'Migrations aplicadas', value: `${(migrations.migrations ?? []).filter((item: any) => item.applied).length}`, detail: `${(migrations.pending ?? []).length} pendentes` },
       { label: 'Bootstrap master', value: bootstrap.master_seed ? 'Executado' : 'Pendente', detail: bootstrap.schema_version?.metadata_value ?? 'sem versão' },
-      { label: 'Etapas smoke', value: `${(smoke.steps ?? []).length}`, detail: 'Checklist operacional' }
+      { label: 'Etapas do smoke test', value: `${(smoke.steps ?? []).length}`, detail: 'Checklist operacional' }
     ];
 
     this.rows = (migrations.migrations ?? []).map((item: any) => ({
       file: item.file,
       version: item.version,
       applied: item.applied ? 'Sim' : 'Não',
-      applied_at: item.applied_at ?? '-'
+      applied_at: item.applied_at ? this.formatDateTime(item.applied_at) : '-'
     }));
     this.applyFilter();
     this.columns = [
-      { field: 'file', headerText: 'Arquivo', width: 240 },
+      { field: 'file', headerText: 'Arquivo', width: 260 },
       { field: 'version', headerText: 'Versão', width: 100 },
-      { field: 'applied', headerText: 'Aplicada', width: 90 },
+      { field: 'applied', headerText: 'Aplicada', width: 100 },
       { field: 'applied_at', headerText: 'Registro', width: 180 }
     ];
 
@@ -350,16 +354,16 @@ export class AdminOpsPageComponent {
 
     this.rows = plans.map((plan: any) => ({
       plan: plan.name,
-      price: plan.price,
+      price: this.formatCurrency(plan.price),
       max_users: plan.max_users,
-      max_storage_mb: plan.max_storage_mb
+      max_storage_mb: this.formatStorage(plan.max_storage_mb)
     }));
     this.applyFilter();
     this.columns = [
       { field: 'plan', headerText: 'Plano', width: 220 },
-      { field: 'price', headerText: 'Preço', width: 100 },
-      { field: 'max_users', headerText: 'Usuários', width: 100 },
-      { field: 'max_storage_mb', headerText: 'Storage MB', width: 120 }
+      { field: 'price', headerText: 'Preço', width: 120 },
+      { field: 'max_users', headerText: 'Usuários', width: 110 },
+      { field: 'max_storage_mb', headerText: 'Armazenamento', width: 140 }
     ];
   }
 
@@ -373,25 +377,25 @@ export class AdminOpsPageComponent {
     }, 0);
 
     this.cards = [
-      { label: 'Receita teórica', value: `R$ ${revenue.toFixed(2).replace('.', ',')}`, detail: 'Soma dos planos vinculados' },
+      { label: 'Receita teórica', value: this.formatCurrency(revenue), detail: 'Soma dos planos vinculados' },
       { label: 'Contas faturáveis', value: `${accounts.filter((item: any) => item.active).length}`, detail: 'Ativas no master' }
     ];
 
     this.rows = accounts.map((account: any) => {
       const plan = planMap.get(Number(account.plan_id));
       return {
-      account: account.name,
-      code: account.code,
-      plan: plan?.name ?? '-',
-      price: plan?.price ?? 0
-    };
+        account: account.name,
+        code: account.code,
+        plan: plan?.name ?? '-',
+        price: this.formatCurrency(plan?.price ?? 0)
+      };
     });
     this.applyFilter();
     this.columns = [
       { field: 'account', headerText: 'Conta', width: 220 },
-      { field: 'code', headerText: 'Código', width: 120 },
+      { field: 'code', headerText: 'Código', width: 140 },
       { field: 'plan', headerText: 'Plano', width: 180 },
-      { field: 'price', headerText: 'Preço', width: 100 }
+      { field: 'price', headerText: 'Preço', width: 120 }
     ];
   }
 
@@ -433,5 +437,42 @@ export class AdminOpsPageComponent {
           .includes(term)
       )
     );
+  }
+
+  private formatCurrency(value: any): string {
+    const number = Number(value ?? 0);
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number);
+  }
+
+  private formatDate(value: any): string {
+    if (!value) {
+      return '-';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+    return new Intl.DateTimeFormat('pt-BR').format(date);
+  }
+
+  private formatDateTime(value: any): string {
+    if (!value) {
+      return '-';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  }
+
+  private formatStorage(value: any): string {
+    return `${new Intl.NumberFormat('pt-BR').format(Number(value ?? 0))} MB`;
   }
 }

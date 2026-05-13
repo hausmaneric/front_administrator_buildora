@@ -1,7 +1,7 @@
 .ops-page {
   display: grid;
-  gap: 18px;
-  padding-bottom: 18px;
+  gap: 16px;
+  padding-bottom: 16px;
 }
 
 .ops-header,
@@ -9,7 +9,7 @@
 .ops-state,
 .ops-panel,
 .ops-card {
-  padding: 22px;
+  padding: 18px;
 }
 
 .ops-header {
@@ -54,7 +54,7 @@
 .ops-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
 .ops-card {
@@ -91,7 +91,7 @@
 .ops-panels {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px;
 }
 
 .ops-panel h4 {
@@ -112,7 +112,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .ops-grid-count {
@@ -122,6 +122,31 @@
 
 .ops-grid-search {
   width: min(320px, 100%);
+}
+
+.ops-grid-shell {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(8, 22, 41, 0.55);
+}
+
+:host ::ng-deep .ops-grid-shell .e-grid {
+  width: 100% !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-gridheader,
+:host ::ng-deep .ops-grid-shell .e-gridcontent,
+:host ::ng-deep .ops-grid-shell .e-content {
+  background: transparent !important;
+}
+
+:host ::ng-deep .ops-grid-shell .e-headercell,
+:host ::ng-deep .ops-grid-shell .e-rowcell {
+  white-space: nowrap !important;
 }
 
 .ops-state {

@@ -28,6 +28,7 @@ export interface LogRow {
   dateTime: string;
   type: string;
   tone: 'success' | 'info' | 'warning' | 'danger';
+  toneLabel?: string;
 }
 
 export interface AlertRow {

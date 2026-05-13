@@ -1,22 +1,4 @@
 <section class="ops-page">
-  <header class="ops-header orb-card">
-    <div>
-      <h3>{{ title }}</h3>
-      <p>{{ subtitle }}</p>
-    </div>
-
-    @if (resource === 'backup') {
-      <div class="ops-actions">
-        <button ejs-button class="action-btn secondary" type="button" (click)="runAction('bootstrap')" [disabled]="actionLoading">
-          Bootstrap master
-        </button>
-        <button ejs-button class="action-btn primary" type="button" (click)="runAction('migrations')" [disabled]="actionLoading">
-          {{ actionLoading ? 'Executando...' : 'Aplicar migrations' }}
-        </button>
-      </div>
-    }
-  </header>
-
   @if (loading) {
     <article class="ops-state orb-card">
       <strong>Carregando {{ title.toLowerCase() }}...</strong>
@@ -27,6 +9,24 @@
       <span>{{ errorMessage }}</span>
     </article>
   } @else {
+    <article class="ops-header orb-card">
+      <div>
+        <h3>{{ title }}</h3>
+        <p>{{ subtitle }}</p>
+      </div>
+
+      @if (resource === 'backup') {
+        <div class="ops-actions">
+          <button ejs-button class="action-btn secondary" type="button" (click)="runAction('bootstrap')" [disabled]="actionLoading">
+            Bootstrap master
+          </button>
+          <button ejs-button class="action-btn primary" type="button" (click)="runAction('migrations')" [disabled]="actionLoading">
+            {{ actionLoading ? 'Executando...' : 'Aplicar migrations' }}
+          </button>
+        </div>
+      }
+    </article>
+
     <div class="ops-cards">
       @for (card of cards; track card.label) {
         <article class="ops-card orb-card" [class]="'tone-' + (card.tone || 'default')">
@@ -52,11 +52,13 @@
         </div>
 
         @if (filteredRows.length) {
-          <ejs-grid [dataSource]="filteredRows" [allowSorting]="true" [allowResizing]="true" [gridLines]="'Horizontal'" [rowHeight]="50">
-            @for (column of columns; track column.field) {
-              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-            }
-          </ejs-grid>
+          <div class="ops-grid-shell">
+            <ejs-grid [dataSource]="filteredRows" [allowSorting]="true" [allowResizing]="true" [gridLines]="'Horizontal'" [rowHeight]="50">
+              @for (column of columns; track column.field) {
+                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
+              }
+            </ejs-grid>
+          </div>
         } @else {
           <div class="empty-grid-state">
             <strong>Nenhum registro encontrado</strong>

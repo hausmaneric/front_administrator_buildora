@@ -44,8 +44,8 @@ export class AdminDashboardService {
       map(({ accounts, plans, modules, masterUsers, accountModules, environment, ready }) => {
         const safeAccounts = this.ensureSuccess(accounts, 'contas');
         const safePlans = this.ensureSuccess(plans, 'planos');
-        const safeModules = this.ensureSuccess(modules, 'modulos');
-        const safeMasterUsers = this.ensureSuccess(masterUsers, 'usuarios master');
+        const safeModules = this.ensureSuccess(modules, 'módulos');
+        const safeMasterUsers = this.ensureSuccess(masterUsers, 'usuários master');
 
         const accountRows = this.extractItems<AdminAccount>(this.safeData<AdminAccount>(safeAccounts));
         const planRows = this.extractItems<AdminPlan>(this.safeData<AdminPlan>(safePlans));
@@ -76,7 +76,7 @@ export class AdminDashboardService {
           recentAccess: this.recentAccess(activeAccounts),
           recentLogs: this.recentLogs(moduleRows, ready?.data ?? {}, environment?.data ?? {}),
           alerts: this.alerts(activeAccounts, storagePercent || accountModuleRows.length),
-          footerStats: cards,
+          footerStats: cards
         };
       })
     );
@@ -191,25 +191,29 @@ export class AdminDashboardService {
         title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal requer validação',
         dateTime: '31/05/2024 10:23',
         type: 'Sistema',
-        tone: ready?.database_config?.valid ? 'success' : 'warning'
+        tone: 'success',
+        toneLabel: ready?.database_config?.valid ? 'Sucesso' : 'Atenção'
       },
       {
         title: `${modules.length} módulos administrativos carregados`,
         dateTime: '31/05/2024 10:15',
         type: 'Módulo',
-        tone: 'info'
+        tone: 'info',
+        toneLabel: 'Informativo'
       },
       {
         title: environment?.security?.secret_key_configured ? 'Secret key de produção configurada' : 'Secret key pendente',
         dateTime: '31/05/2024 09:58',
         type: 'Segurança',
-        tone: environment?.security?.secret_key_configured ? 'success' : 'warning'
+        tone: environment?.security?.secret_key_configured ? 'success' : 'warning',
+        toneLabel: environment?.security?.secret_key_configured ? 'Sucesso' : 'Atenção'
       },
       {
         title: 'Bootstrap master executado com sucesso',
         dateTime: '31/05/2024 09:41',
         type: 'Bootstrap',
-        tone: 'success'
+        tone: 'success',
+        toneLabel: 'Sucesso'
       }
     ];
 
@@ -220,7 +224,7 @@ export class AdminDashboardService {
     const alertRows: AlertRow[] = accounts.slice(0, 4).map((account, index) => ({
       title: account.name,
       message: index % 2 === 0 ? 'Armazenamento acima de 90%' : 'Assinatura vencendo em 3 dias',
-      secondary: index % 2 === 0 ? `${90 + index}%` : `Vencimento: ${account.expiration_date}`,
+      secondary: index % 2 === 0 ? `${90 + index}%` : `Vencimento: ${this.formatDate(account.expiration_date)}`,
       percent: index % 2 === 0 ? 90 + index : undefined,
       tone: index % 2 === 0 ? 'danger' : 'warning'
     }));
@@ -240,5 +244,16 @@ export class AdminDashboardService {
   private formatTb(valueMb: number): string {
     const tb = valueMb / (1024 * 1024);
     return `${tb.toFixed(2).replace('.', ',')} TB`;
+  }
+
+  private formatDate(value: any): string {
+    if (!value) {
+      return '-';
+    }
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+    return new Intl.DateTimeFormat('pt-BR').format(date);
   }
 }
