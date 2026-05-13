@@ -47,13 +47,6 @@ export class AdminOpsPageComponent {
     });
   }
 
-  private flushView(): void {
-    queueMicrotask(() => {
-      window.dispatchEvent(new Event('resize'));
-      this.cdr.detectChanges();
-    });
-  }
-
   load(): void {
     const token = this.loginService.getToken();
     if (!token) {
@@ -104,7 +97,7 @@ export class AdminOpsPageComponent {
       .subscribe({
         next: () => this.load(),
         error: (error) => {
-          const message = error?.error?.message || 'Falha ao executar a ação administrativa.';
+          const message = error?.error?.message || 'Falha ao executar a acao administrativa.';
           if (this.isAuthenticationFailure(message)) {
             this.redirectToLogin();
             return;
@@ -113,6 +106,17 @@ export class AdminOpsPageComponent {
           this.flushView();
         }
       });
+  }
+
+  onSearch(term: string): void {
+    this.searchTerm = term ?? '';
+    this.applyFilter();
+  }
+
+  totalRowsLabel(): string {
+    const total = this.rows.length;
+    const filtered = this.filteredRows.length;
+    return filtered === total ? `${total} registros` : `${filtered} de ${total} registros`;
   }
 
   private requestFor(resource: string, token: string): Observable<any> {
@@ -202,17 +206,6 @@ export class AdminOpsPageComponent {
     this.flushView();
   }
 
-  onSearch(term: string): void {
-    this.searchTerm = term ?? '';
-    this.applyFilter();
-  }
-
-  totalRowsLabel(): string {
-    const total = this.rows.length;
-    const filtered = this.filteredRows.length;
-    return filtered === total ? `${total} registros` : `${filtered} de ${total} registros`;
-  }
-
   private mapSubscriptions(accounts: any[]): void {
     const now = Date.now();
     const expiring = accounts.filter((item) => {
@@ -223,22 +216,22 @@ export class AdminOpsPageComponent {
 
     this.cards = [
       { label: 'Contas ativas', value: `${accounts.filter((item) => item.active).length}`, detail: 'Assinaturas habilitadas' },
-      { label: 'Vencendo', value: `${expiring}`, detail: 'Nos próximos 7 dias', tone: 'warning' },
-      { label: 'Vencidas', value: `${expired}`, detail: 'Exigem ação imediata', tone: 'danger' }
+      { label: 'Vencendo', value: `${expiring}`, detail: 'Nos proximos 7 dias', tone: 'warning' },
+      { label: 'Vencidas', value: `${expired}`, detail: 'Exigem acao imediata', tone: 'danger' }
     ];
     this.rows = accounts.map((item) => ({
       name: item.name,
       code: item.code,
       email: item.email,
-      expiration_date: this.formatDate(item.expiration_date)
+      expirationDate: this.formatDate(item.expiration_date)
     }));
-    this.applyFilter();
     this.columns = [
       { field: 'name', headerText: 'Conta', width: 260 },
-      { field: 'code', headerText: 'Código', width: 150 },
+      { field: 'code', headerText: 'Codigo', width: 150 },
       { field: 'email', headerText: 'E-mail', width: 260 },
-      { field: 'expiration_date', headerText: 'Vencimento', width: 160 }
+      { field: 'expirationDate', headerText: 'Vencimento', width: 160 }
     ];
+    this.applyFilter();
   }
 
   private mapStorage(accounts: any[]): void {
@@ -254,37 +247,37 @@ export class AdminOpsPageComponent {
     this.rows = accounts.map((item) => ({
       name: item.name,
       code: item.code,
-      storage_limit_mb: this.formatStorage(item.storage_limit_mb),
-      storage_used_mb: this.formatStorage(item.storage_used_mb),
-      usage_percent: `${item.storage_limit_mb ? Math.round((Number(item.storage_used_mb || 0) / Number(item.storage_limit_mb || 1)) * 100) : 0}%`
+      storageLimit: this.formatStorage(item.storage_limit_mb),
+      storageUsed: this.formatStorage(item.storage_used_mb),
+      usagePercent: `${item.storage_limit_mb ? Math.round((Number(item.storage_used_mb || 0) / Number(item.storage_limit_mb || 1)) * 100) : 0}%`
     }));
-    this.applyFilter();
     this.columns = [
       { field: 'name', headerText: 'Conta', width: 260 },
-      { field: 'code', headerText: 'Código', width: 150 },
-      { field: 'storage_limit_mb', headerText: 'Limite', width: 170 },
-      { field: 'storage_used_mb', headerText: 'Uso atual', width: 170 },
-      { field: 'usage_percent', headerText: 'Uso', width: 110 }
+      { field: 'code', headerText: 'Codigo', width: 150 },
+      { field: 'storageLimit', headerText: 'Limite', width: 170 },
+      { field: 'storageUsed', headerText: 'Uso atual', width: 170 },
+      { field: 'usagePercent', headerText: 'Uso', width: 110 }
     ];
+    this.applyFilter();
   }
 
   private mapRoutes(data: any): void {
     const routes = data.routes ?? [];
     this.cards = [
-      { label: 'Total de rotas', value: `${data.total_routes ?? routes.length}`, detail: 'Catálogo publicado' },
+      { label: 'Total de rotas', value: `${data.total_routes ?? routes.length}`, detail: 'Catalogo publicado' },
       { label: 'API', value: `${data.name ?? 'OBRAX API'}`, detail: `${data.version ?? '1.0.0'}` }
     ];
     this.rows = routes.map((item: any) => ({
-      method: item.methods?.join(', ') ?? '',
+      methods: item.methods?.join(', ') ?? '',
       path: item.path,
-      requires_token: item.requires_token_id ? 'Sim' : 'Não'
+      tokenRequired: item.requires_token_id ? 'Sim' : 'Nao'
     }));
-    this.applyFilter();
     this.columns = [
-      { field: 'method', headerText: 'Métodos', width: 160 },
+      { field: 'methods', headerText: 'Metodos', width: 160 },
       { field: 'path', headerText: 'Rota', width: 520 },
-      { field: 'requires_token', headerText: 'Exige token', width: 140 }
+      { field: 'tokenRequired', headerText: 'Exige token', width: 140 }
     ];
+    this.applyFilter();
   }
 
   private mapAuditing(payload: any): void {
@@ -293,22 +286,22 @@ export class AdminOpsPageComponent {
     const ready = payload.ready?.data ?? {};
 
     this.cards = [
-      { label: 'Schema compatível', value: schema.compatible ? 'Sim' : 'Não', detail: `${(schema.missing_tables ?? []).length} tabelas faltantes`, tone: schema.compatible ? 'success' : 'danger' },
+      { label: 'Schema compativel', value: schema.compatible ? 'Sim' : 'Nao', detail: `${(schema.missing_tables ?? []).length} tabelas faltantes`, tone: schema.compatible ? 'success' : 'danger' },
       { label: 'Banco principal', value: ready.database_ping?.ok ? 'Online' : 'Falhou', detail: ready.database_config?.mode ?? 'desconhecido' },
-      { label: 'Segurança', value: security.secret_key_changed ? 'OK' : 'Revisar', detail: security.database_ssl_required ? 'SSL requerido' : 'SSL pendente' }
+      { label: 'Seguranca', value: security.secret_key_changed ? 'OK' : 'Revisar', detail: security.database_ssl_required ? 'SSL requerido' : 'SSL pendente' }
     ];
 
     this.panels = [
       {
-        title: 'Tabelas obrigatórias ausentes',
+        title: 'Tabelas obrigatorias ausentes',
         lines: (schema.missing_tables ?? []).length ? schema.missing_tables : ['Nenhuma tabela pendente']
       },
       {
-        title: 'Checklist de segurança',
+        title: 'Checklist de seguranca',
         lines: [
-          `Secret key alterada: ${security.secret_key_changed ? 'sim' : 'não'}`,
-          `SSL no banco: ${security.database_ssl_required ? 'sim' : 'não'}`,
-          `Senha configurada: ${security.database_password_configured ? 'sim' : 'não'}`
+          `Secret key alterada: ${security.secret_key_changed ? 'sim' : 'nao'}`,
+          `SSL no banco: ${security.database_ssl_required ? 'sim' : 'nao'}`,
+          `Senha configurada: ${security.database_password_configured ? 'sim' : 'nao'}`
         ]
       }
     ];
@@ -321,7 +314,7 @@ export class AdminOpsPageComponent {
 
     this.cards = [
       { label: 'Migrations pendentes', value: `${(migrations.pending ?? []).length}`, detail: `${(migrations.applied ?? []).length} aplicadas` },
-      { label: 'Bootstrap master', value: bootstrap.seeded ? 'Concluído' : 'Pendente', detail: bootstrap.schema_version ?? 'sem versão' },
+      { label: 'Bootstrap master', value: bootstrap.seeded ? 'Concluido' : 'Pendente', detail: bootstrap.schema_version ?? 'sem versao' },
       { label: 'Etapas smoke', value: `${(smoke.stages ?? []).length}`, detail: 'Checklist operacional' }
     ];
 
@@ -343,15 +336,15 @@ export class AdminOpsPageComponent {
     const environment = payload.environment?.data ?? {};
 
     this.cards = [
-      { label: 'Rotas públicas', value: `${routes.total_routes ?? 0}`, detail: 'Mapa de suporte' },
-      { label: 'Módulos documentados', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catálogo publicado' },
+      { label: 'Rotas publicas', value: `${routes.total_routes ?? 0}`, detail: 'Mapa de suporte' },
+      { label: 'Modulos documentados', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catalogo publicado' },
       { label: 'Runtime Python', value: environment.python_runtime ?? '-', detail: 'Ambiente atual' }
     ];
 
     this.panels = [
       {
-        title: 'Módulos disponíveis',
-        lines: Object.keys(catalog.modules ?? {}).length ? Object.keys(catalog.modules ?? {}) : ['Nenhum módulo documentado']
+        title: 'Modulos disponiveis',
+        lines: Object.keys(catalog.modules ?? {}).length ? Object.keys(catalog.modules ?? {}) : ['Nenhum modulo documentado']
       },
       {
         title: 'Banco principal',
@@ -371,23 +364,23 @@ export class AdminOpsPageComponent {
 
     this.cards = [
       { label: 'Contas', value: `${accounts.length}`, detail: 'Base master atual' },
-      { label: 'Planos', value: `${plans.length}`, detail: 'Catálogo comercial' },
-      { label: 'Módulos', value: `${modules.length}`, detail: 'Componentes da plataforma' }
+      { label: 'Planos', value: `${plans.length}`, detail: 'Catalogo comercial' },
+      { label: 'Modulos', value: `${modules.length}`, detail: 'Componentes da plataforma' }
     ];
 
     this.rows = accounts.map((item: any) => ({
       conta: item.name,
       plano: plans.find((plan: any) => Number(plan.id) === Number(item.plan_id))?.name ?? `Plano #${item.plan_id}`,
       armazenamento: this.formatStorage(item.storage_used_mb),
-      ativo: item.active ? 'Sim' : 'Não'
+      ativo: item.active ? 'Ativo' : 'Inativo'
     }));
-    this.applyFilter();
     this.columns = [
       { field: 'conta', headerText: 'Conta', width: 260 },
       { field: 'plano', headerText: 'Plano', width: 220 },
       { field: 'armazenamento', headerText: 'Armazenamento', width: 170 },
-      { field: 'ativo', headerText: 'Ativo', width: 110 }
+      { field: 'ativo', headerText: 'Situacao', width: 120 }
     ];
+    this.applyFilter();
   }
 
   private mapFinancial(payload: any): void {
@@ -400,8 +393,8 @@ export class AdminOpsPageComponent {
 
     this.cards = [
       { label: 'Receita mensal projetada', value: this.formatCurrency(projected), detail: 'Somando planos vinculados' },
-      { label: 'Contas faturáveis', value: `${accounts.length}`, detail: 'Base contratual' },
-      { label: 'Ticket médio', value: this.formatCurrency(accounts.length ? projected / accounts.length : 0), detail: 'Por conta ativa' }
+      { label: 'Contas faturaveis', value: `${accounts.length}`, detail: 'Base contratual' },
+      { label: 'Ticket medio', value: this.formatCurrency(accounts.length ? projected / accounts.length : 0), detail: 'Por conta ativa' }
     ];
 
     this.rows = accounts.map((item: any) => {
@@ -413,13 +406,13 @@ export class AdminOpsPageComponent {
         vencimento: this.formatDate(item.expiration_date)
       };
     });
-    this.applyFilter();
     this.columns = [
       { field: 'conta', headerText: 'Conta', width: 260 },
       { field: 'plano', headerText: 'Plano', width: 220 },
       { field: 'valor', headerText: 'Valor', width: 150 },
       { field: 'vencimento', headerText: 'Vencimento', width: 150 }
     ];
+    this.applyFilter();
   }
 
   private mapSettings(payload: any): void {
@@ -428,24 +421,24 @@ export class AdminOpsPageComponent {
     const catalog = payload.catalog?.data ?? {};
 
     this.cards = [
-      { label: 'Secret key', value: security.secret_key_changed ? 'OK' : 'Revisar', detail: 'Segurança de produção' },
-      { label: 'Conexão principal', value: environment.database?.validation?.valid ? 'Válida' : 'Inválida', detail: environment.database?.validation?.mode ?? '-' },
-      { label: 'Módulos visíveis', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catálogo atual' }
+      { label: 'Secret key', value: security.secret_key_changed ? 'OK' : 'Revisar', detail: 'Seguranca de producao' },
+      { label: 'Conexao principal', value: environment.database?.validation?.valid ? 'Valida' : 'Invalida', detail: environment.database?.validation?.mode ?? '-' },
+      { label: 'Modulos visiveis', value: `${Object.keys(catalog.modules ?? {}).length}`, detail: 'Catalogo atual' }
     ];
 
     this.panels = [
       {
-        title: 'Validação do banco',
+        title: 'Validacao do banco',
         lines: (environment.database?.validation?.issues ?? []).length
           ? environment.database.validation.issues
-          : ['Sem inconsistências de configuração']
+          : ['Sem inconsistencias de configuracao']
       },
       {
-        title: 'Segurança',
+        title: 'Seguranca',
         lines: [
-          `Secret key configurada: ${security.secret_key_configured ? 'sim' : 'não'}`,
-          `Secret key alterada: ${security.secret_key_changed ? 'sim' : 'não'}`,
-          `SSL requerido: ${security.database_ssl_required ? 'sim' : 'não'}`
+          `Secret key configurada: ${security.secret_key_configured ? 'sim' : 'nao'}`,
+          `Secret key alterada: ${security.secret_key_changed ? 'sim' : 'nao'}`,
+          `SSL requerido: ${security.database_ssl_required ? 'sim' : 'nao'}`
         ]
       }
     ];
@@ -490,5 +483,12 @@ export class AdminOpsPageComponent {
   private redirectToLogin(): void {
     this.loginService.clearToken();
     void this.router.navigate(['/login']);
+  }
+
+  private flushView(): void {
+    queueMicrotask(() => {
+      window.dispatchEvent(new Event('resize'));
+      this.cdr.detectChanges();
+    });
   }
 }

@@ -10,27 +10,6 @@ import { AdminDataService } from './admin-data.service';
 export class AdminDashboardService {
   constructor(private adminDataService: AdminDataService) {}
 
-  private ensureSuccess(response: any, label: string): any {
-    if (!response?.status) {
-      throw new Error(response?.message || `Falha ao carregar ${label}.`);
-    }
-    return response;
-  }
-
-  private safeData<T>(response: any): T[] | AdminPagedResponse<T> {
-    if (!response?.status) {
-      return [] as T[];
-    }
-    return (response.data ?? []) as T[] | AdminPagedResponse<T>;
-  }
-
-  private extractItems<T>(data: T[] | AdminPagedResponse<T> | null | undefined): T[] {
-    if (!data) {
-      return [];
-    }
-    return Array.isArray(data) ? data : data.items ?? [];
-  }
-
   load(token: string): Observable<AdminDashboardViewModel> {
     return forkJoin({
       accounts: this.adminDataService.accounts(token),
@@ -42,20 +21,15 @@ export class AdminDashboardService {
       ready: this.adminDataService.ready().pipe(catchError(() => of({ status: false, data: {} })))
     }).pipe(
       map(({ accounts, plans, modules, masterUsers, accountModules, environment, ready }) => {
-        const safeAccounts = this.ensureSuccess(accounts, 'contas');
-        const safePlans = this.ensureSuccess(plans, 'planos');
-        const safeModules = this.ensureSuccess(modules, 'módulos');
-        const safeMasterUsers = this.ensureSuccess(masterUsers, 'usuários master');
+        const accountRows = this.extractItems<AdminAccount>(this.ensureSuccess(accounts, 'contas'));
+        const planRows = this.extractItems<AdminPlan>(this.ensureSuccess(plans, 'planos'));
+        const moduleRows = this.extractItems<AdminModule>(this.ensureSuccess(modules, 'modulos'));
+        const masterUserRows = this.extractItems<AdminMasterUser>(this.ensureSuccess(masterUsers, 'usuarios master'));
+        const accountModuleRows = this.extractItems<any>(accountModules?.data ?? []);
 
-        const accountRows = this.extractItems<AdminAccount>(this.safeData<AdminAccount>(safeAccounts));
-        const planRows = this.extractItems<AdminPlan>(this.safeData<AdminPlan>(safePlans));
-        const moduleRows = this.extractItems<AdminModule>(this.safeData<AdminModule>(safeModules));
-        const masterUserRows = this.extractItems<AdminMasterUser>(this.safeData<AdminMasterUser>(safeMasterUsers));
-        const accountModuleRows = this.extractItems(this.safeData(accountModules));
-
-        const activeAccounts = accountRows.filter((item: AdminAccount) => item.active === true);
-        const totalStorageMb = activeAccounts.reduce((sum: number, item: AdminAccount) => sum + Number(item.storage_limit_mb || 0), 0);
-        const usedStorageMb = activeAccounts.reduce((sum: number, item: AdminAccount) => sum + Number(item.storage_used_mb || 0), 0);
+        const activeAccounts = accountRows.filter((item) => item.active === true);
+        const totalStorageMb = activeAccounts.reduce((sum, item) => sum + Number(item.storage_limit_mb || 0), 0);
+        const usedStorageMb = activeAccounts.reduce((sum, item) => sum + Number(item.storage_used_mb || 0), 0);
         const storagePercent = totalStorageMb > 0 ? Math.round((usedStorageMb / totalStorageMb) * 100) : 0;
 
         const cards = this.buildCards(
@@ -82,6 +56,20 @@ export class AdminDashboardService {
     );
   }
 
+  private ensureSuccess(response: any, label: string): any[] | AdminPagedResponse<any> {
+    if (!response?.status) {
+      throw new Error(response?.message || `Falha ao carregar ${label}.`);
+    }
+    return response.data ?? [];
+  }
+
+  private extractItems<T>(data: T[] | AdminPagedResponse<T> | null | undefined): T[] {
+    if (!data) {
+      return [];
+    }
+    return Array.isArray(data) ? data : data.items ?? [];
+  }
+
   private buildCards(
     accounts: AdminAccount[],
     plans: AdminPlan[],
@@ -95,7 +83,7 @@ export class AdminDashboardService {
       {
         title: 'EMPRESAS ATIVAS',
         value: `${accounts.length}`,
-        delta: `+${Math.max(accounts.length, 1)} este mês`,
+        delta: `+${Math.max(accounts.length, 1)} neste mes`,
         tone: 'blue',
         icon: 'building',
         sparkline: [12, 18, 16, 21, 24, 22, 28, 31]
@@ -103,13 +91,13 @@ export class AdminDashboardService {
       {
         title: 'PLANOS CADASTRADOS',
         value: `${plans.length}`,
-        delta: `+${Math.max(plans.length - 1, 1)} disponíveis`,
+        delta: `+${Math.max(plans.length - 1, 1)} disponiveis`,
         tone: 'green',
         icon: 'briefcase',
         sparkline: [4, 5, 5, 6, 7, 7, 8, 9]
       },
       {
-        title: 'MÓDULOS DISPONÍVEIS',
+        title: 'MODULOS DISPONIVEIS',
         value: `${modules.length}`,
         delta: `+${Math.max(modules.length - 2, 1)} ativos`,
         tone: 'amber',
@@ -117,7 +105,7 @@ export class AdminDashboardService {
         sparkline: [3, 4, 3, 4, 5, 5, 6, 7]
       },
       {
-        title: 'USUÁRIOS MASTER',
+        title: 'USUARIOS MASTER',
         value: `${masterUsers.length}`,
         delta: `+${Math.max(masterUsers.length - 1, 1)} administradores`,
         tone: 'violet',
@@ -188,25 +176,25 @@ export class AdminDashboardService {
   private recentLogs(modules: AdminModule[], ready: any, environment: any): LogRow[] {
     return [
       {
-        title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal requer validação',
+        title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal precisa de revisao',
         dateTime: '31/05/2024 10:23',
         type: 'Sistema',
         tone: 'success',
-        toneLabel: ready?.database_config?.valid ? 'Sucesso' : 'Atenção'
+        toneLabel: ready?.database_config?.valid ? 'Sucesso' : 'Atencao'
       },
       {
-        title: `${modules.length} módulos administrativos carregados`,
+        title: `${modules.length} modulos administrativos carregados`,
         dateTime: '31/05/2024 10:15',
-        type: 'Módulo',
+        type: 'Modulo',
         tone: 'info',
         toneLabel: 'Informativo'
       },
       {
-        title: environment?.security?.secret_key_configured ? 'Secret key de produção configurada' : 'Secret key pendente',
+        title: environment?.security?.secret_key_configured ? 'Secret key de producao configurada' : 'Secret key pendente',
         dateTime: '31/05/2024 09:58',
-        type: 'Segurança',
+        type: 'Seguranca',
         tone: environment?.security?.secret_key_configured ? 'success' : 'warning',
-        toneLabel: environment?.security?.secret_key_configured ? 'Sucesso' : 'Atenção'
+        toneLabel: environment?.security?.secret_key_configured ? 'Sucesso' : 'Atencao'
       },
       {
         title: 'Bootstrap master executado com sucesso',
@@ -229,8 +217,8 @@ export class AdminDashboardService {
 
     if (!alertRows.length) {
       alertRows.push({
-        title: 'Ambiente estável',
-        message: 'Nenhum alerta crítico identificado',
+        title: 'Ambiente estavel',
+        message: 'Nenhum alerta critico identificado',
         secondary: `${storagePercent}% de uso consolidado`,
         tone: 'warning'
       });

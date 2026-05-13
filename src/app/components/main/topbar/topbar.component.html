@@ -1,6 +1,6 @@
 <header class="topbar orb-card">
   <div class="topbar-left">
-    <button class="menu-btn" (click)="layoutService.onMenuToggle()">
+    <button class="menu-btn" type="button" (click)="layoutService.onMenuToggle()">
       <span></span>
       <span></span>
       <span></span>
@@ -17,7 +17,7 @@
       <i class="icon-search"></i>
     </button>
 
-    <button class="icon-btn notification-btn" type="button" title="Abrir logs e notificações" (click)="openNotifications()">
+    <button class="icon-btn notification-btn" type="button" title="Abrir logs e notificacoes" (click)="openNotifications()">
       <i class="icon-bell"></i>
       <span class="badge">3</span>
     </button>
@@ -28,7 +28,8 @@
         cssClass="date-range-dropdown"
         [dataSource]="dateRanges"
         [fields]="{ text: 'text', value: 'id' }"
-        [value]="currentDateRange">
+        [value]="currentDateRange"
+        (change)="onDateRangeChange($any($event).value)">
       </ejs-dropdownlist>
     </div>
   </div>

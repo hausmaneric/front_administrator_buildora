@@ -3,13 +3,13 @@
     <div class="loading-dot"></div>
     <div class="loading-copy">
       <strong>Carregando dashboard administrativo...</strong>
-      <span>Consultando contas, planos, módulos e saúde do ambiente.</span>
+      <span>Consultando contas, planos, modulos e saude do ambiente.</span>
     </div>
   </section>
 } @else if (errorMessage) {
   <section class="dashboard-loading orb-card error-state">
     <div class="loading-copy">
-      <strong>Não foi possível montar o dashboard</strong>
+      <strong>Nao foi possivel montar o dashboard</strong>
       <span>{{ errorMessage }}</span>
     </div>
   </section>
@@ -105,8 +105,8 @@
     <div class="data-grid">
       <article class="data-card orb-card">
         <div class="data-card-header">
-          <h3>Últimos acessos</h3>
-          <button type="button" (click)="openSection('accounts')">Ver todos</button>
+          <h3>Ultimos acessos</h3>
+          <button type="button" (click)="openSection('accounts')">Ver tudo</button>
         </div>
         <ejs-grid [dataSource]="viewModel.recentAccess" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
           <e-columns>
@@ -120,7 +120,7 @@
       <article class="data-card orb-card">
         <div class="data-card-header">
           <h3>Logs recentes</h3>
-          <button type="button" (click)="openSection('logs')">Ver todos</button>
+          <button type="button" (click)="openSection('logs')">Ver tudo</button>
         </div>
         <ejs-grid [dataSource]="viewModel.recentLogs" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
           <e-columns>
@@ -134,7 +134,7 @@
       <article class="alerts-card orb-card">
         <div class="data-card-header">
           <h3>Empresas com alertas</h3>
-          <button type="button" (click)="openSection('storage')">Ver todos</button>
+          <button type="button" (click)="openSection('storage')">Ver tudo</button>
         </div>
 
         <div class="alerts-list">

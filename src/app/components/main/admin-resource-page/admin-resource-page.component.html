@@ -7,7 +7,7 @@
             <strong>{{ toast.title }}</strong>
             <p>{{ toast.message }}</p>
           </div>
-          <button type="button" class="toast-close" (click)="dismissToast(toast.id)">×</button>
+          <button type="button" class="toast-close" (click)="dismissToast(toast.id)">x</button>
         </div>
       }
     </div>
@@ -32,7 +32,7 @@
       <div class="resource-topline">
         <div class="resource-summary">
           <span class="metric-pill">Total: <strong>{{ totalItems }}</strong></span>
-          <span class="metric-pill">Página: <strong>{{ currentPage }}</strong></span>
+          <span class="metric-pill">Pagina: <strong>{{ currentPage }}</strong></span>
           <span class="metric-pill">Mostrando: <strong>{{ rows.length }}</strong></span>
           <span class="metric-pill">Busca: <strong>{{ appliedSearch || 'Sem filtro' }}</strong></span>
         </div>
@@ -63,7 +63,7 @@
           </ejs-dropdownlist>
         </div>
         <div class="control-item">
-          <label>Direção</label>
+          <label>Direcao</label>
           <ejs-dropdownlist
             [dataSource]="sortDirectionOptions"
             [fields]="{ text: 'text', value: 'id' }"
@@ -72,7 +72,7 @@
           </ejs-dropdownlist>
         </div>
         <div class="control-item">
-          <label>Tamanho da página</label>
+          <label>Tamanho da pagina</label>
           <ejs-dropdownlist
             [dataSource]="pageSizeOptions"
             [fields]="{ text: 'text', value: 'id' }"
@@ -94,7 +94,7 @@
               @for (column of columns; track column.field) {
                 <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
               }
-              <e-column headerText="Ações" [width]="220">
+              <e-column headerText="Acoes" [width]="240">
                 <ng-template #template let-data>
                   <div class="row-actions">
                     <button ejs-button cssClass="row-action edit" type="button" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">Editar</button>
@@ -110,12 +110,12 @@
         <div class="pager-bar">
           <button ejs-button cssClass="dialog-secondary" type="button" [disabled]="offset <= 0" (click)="previousPage()">Anterior</button>
           <div class="pager-info">{{ totalRowsLabel() }}</div>
-          <button ejs-button cssClass="dialog-primary" type="button" [disabled]="!hasNext" (click)="nextPage()">Próxima</button>
+          <button ejs-button cssClass="dialog-primary" type="button" [disabled]="!hasNext" (click)="nextPage()">Proxima</button>
         </div>
       } @else {
         <div class="empty-grid-state">
           <strong>Nenhum registro encontrado</strong>
-          <p>Ajuste a busca ou crie um novo cadastro para este módulo.</p>
+          <p>Ajuste a busca ou crie um novo cadastro para este modulo.</p>
         </div>
       }
     </article>
@@ -127,7 +127,7 @@
         @case ('accounts') {
           <div class="form-grid two-cols">
             <div class="form-field">
-              <label>Código</label>
+              <label>Codigo</label>
               <ejs-textbox formControlName="code" cssClass="orb-input"></ejs-textbox>
             </div>
             <div class="form-field">
@@ -163,7 +163,7 @@
               @if (fieldError('storage_limit_mb')) { <small class="field-error">{{ fieldError('storage_limit_mb') }}</small> }
             </div>
             <div class="form-field">
-              <label>Expiração</label>
+              <label>Vencimento</label>
               <ejs-textbox formControlName="expiration_date" cssClass="orb-input"></ejs-textbox>
               @if (fieldError('expiration_date')) { <small class="field-error">{{ fieldError('expiration_date') }}</small> }
             </div>
@@ -177,25 +177,25 @@
               @if (fieldError('name')) { <small class="field-error">{{ fieldError('name') }}</small> }
             </div>
             <div class="form-field">
-              <label>Preço</label>
+              <label>Preco</label>
               <ejs-textbox formControlName="price" cssClass="orb-input"></ejs-textbox>
               @if (fieldError('price')) { <small class="field-error">{{ fieldError('price') }}</small> }
             </div>
             <div class="form-field full-span">
-              <label>Descrição</label>
+              <label>Descricao</label>
               <ejs-textbox formControlName="description" cssClass="orb-input"></ejs-textbox>
             </div>
-            <div class="form-field"><label>Máx. empresas</label><ejs-textbox formControlName="max_companies" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_companies')) { <small class="field-error">{{ fieldError('max_companies') }}</small> }</div>
-            <div class="form-field"><label>Máx. usuários</label><ejs-textbox formControlName="max_users" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_users')) { <small class="field-error">{{ fieldError('max_users') }}</small> }</div>
-            <div class="form-field"><label>Máx. obras</label><ejs-textbox formControlName="max_works" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_works')) { <small class="field-error">{{ fieldError('max_works') }}</small> }</div>
+            <div class="form-field"><label>Maximo de empresas</label><ejs-textbox formControlName="max_companies" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_companies')) { <small class="field-error">{{ fieldError('max_companies') }}</small> }</div>
+            <div class="form-field"><label>Maximo de usuarios</label><ejs-textbox formControlName="max_users" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_users')) { <small class="field-error">{{ fieldError('max_users') }}</small> }</div>
+            <div class="form-field"><label>Maximo de obras</label><ejs-textbox formControlName="max_works" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_works')) { <small class="field-error">{{ fieldError('max_works') }}</small> }</div>
             <div class="form-field"><label>Armazenamento (MB)</label><ejs-textbox formControlName="max_storage_mb" cssClass="orb-input"></ejs-textbox>@if (fieldError('max_storage_mb')) { <small class="field-error">{{ fieldError('max_storage_mb') }}</small> }</div>
           </div>
         }
         @case ('modules') {
           <div class="form-grid">
-            <div class="form-field"><label>Código</label><ejs-textbox formControlName="code" cssClass="orb-input"></ejs-textbox>@if (fieldError('code')) { <small class="field-error">{{ fieldError('code') }}</small> }</div>
+            <div class="form-field"><label>Codigo</label><ejs-textbox formControlName="code" cssClass="orb-input"></ejs-textbox>@if (fieldError('code')) { <small class="field-error">{{ fieldError('code') }}</small> }</div>
             <div class="form-field"><label>Nome</label><ejs-textbox formControlName="name" cssClass="orb-input"></ejs-textbox>@if (fieldError('name')) { <small class="field-error">{{ fieldError('name') }}</small> }</div>
-            <div class="form-field"><label>Descrição</label><ejs-textbox formControlName="description" cssClass="orb-input"></ejs-textbox></div>
+            <div class="form-field"><label>Descricao</label><ejs-textbox formControlName="description" cssClass="orb-input"></ejs-textbox></div>
           </div>
         }
         @case ('masterUsers') {
@@ -218,7 +218,7 @@
               <ejs-dropdownlist formControlName="account_id" [dataSource]="accountOptions" [fields]="{ text: 'text', value: 'id' }"></ejs-dropdownlist>
             </div>
             <div class="form-field">
-              <label>Módulo</label>
+              <label>Modulo</label>
               <ejs-dropdownlist formControlName="module_code" [dataSource]="moduleOptions" [fields]="{ text: 'text', value: 'id' }"></ejs-dropdownlist>
             </div>
           </div>
