@@ -10,6 +10,31 @@ import * as resources from '../resources';
 export class LoginService {
   constructor(private http: HttpClient) {}
 
+  private decodePayload(token: string): Record<string, any> | null {
+    try {
+      const payload = token.split('.')[1];
+      if (!payload) {
+        return null;
+      }
+
+      const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+      const decoded = atob(normalized.padEnd(normalized.length + ((4 - normalized.length % 4) % 4), '='));
+      return JSON.parse(decoded);
+    } catch {
+      return null;
+    }
+  }
+
+  private isTokenExpired(token: string): boolean {
+    const payload = this.decodePayload(token);
+    const exp = Number(payload?.['exp'] ?? 0);
+    if (!exp) {
+      return true;
+    }
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    return exp <= nowInSeconds;
+  }
+
   masterLogin(payload: MasterLoginPayload): Observable<NxResult<MasterLoginData>> {
     return this.http.post<NxResult<MasterLoginData>>(`${resources.apiURL}auth/master/login/`, payload);
   }
@@ -28,7 +53,21 @@ export class LoginService {
 
   getLocalToken(): StoredSession | null {
     const stored = localStorage.getItem(resources.sessionStorageKey);
-    return stored ? JSON.parse(stored) : null;
+    if (!stored) {
+      return null;
+    }
+
+    try {
+      const parsed = JSON.parse(stored) as StoredSession;
+      if (!parsed?.token || this.isTokenExpired(parsed.token)) {
+        this.clearToken();
+        return null;
+      }
+      return parsed;
+    } catch {
+      this.clearToken();
+      return null;
+    }
   }
 
   getToken(): string {
