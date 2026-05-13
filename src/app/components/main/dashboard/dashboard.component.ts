@@ -31,7 +31,7 @@ export class DashboardComponent {
 
   accessColumns = [
     { field: 'company', headerText: 'Empresa', width: 220 },
-    { field: 'user', headerText: 'Usuario', width: 220 },
+    { field: 'user', headerText: 'Usuário', width: 220 },
     { field: 'dateTime', headerText: 'Data e hora', width: 160 },
     { field: 'ip', headerText: 'IP', width: 140 },
     { field: 'badge', headerText: 'Conta', width: 150 }

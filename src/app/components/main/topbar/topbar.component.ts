@@ -16,7 +16,7 @@ import { defaultDateRange } from '../../../resources';
 })
 export class TopbarComponent {
   title = 'Dashboard';
-  subtitle = 'Visao geral da plataforma';
+  subtitle = 'Visão geral da plataforma';
   currentDateRange = localStorage.getItem('obrax.admin.date-range') || defaultDateRange;
 
   readonly dateRanges = [
@@ -62,6 +62,6 @@ export class TopbarComponent {
   private syncTitle(): void {
     const current = this.router.routerState.snapshot.root.firstChild?.firstChild;
     this.title = current?.data?.['title'] ?? 'Dashboard';
-    this.subtitle = current?.data?.['subtitle'] ?? 'Visao geral da plataforma';
+    this.subtitle = current?.data?.['subtitle'] ?? 'Visão geral da plataforma';
   }
 }

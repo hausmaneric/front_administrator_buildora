@@ -38,15 +38,15 @@ export class MenuComponent {
   sections: MenuSection[] = [
     {
       id: 'gestao',
-      name: 'GESTAO',
+      name: 'GESTÃO',
       items: [
         { id: 'accounts', name: 'Empresas / Contas', iconKey: 'briefcase', route: '/main/accounts' },
         { id: 'plans', name: 'Planos', iconKey: 'wallet', route: '/main/plans' },
-        { id: 'modules', name: 'Modulos', iconKey: 'grid', route: '/main/modules' },
-        { id: 'account-modules', name: 'Modulos por Conta', iconKey: 'link', route: '/main/account-modules' },
+        { id: 'modules', name: 'Módulos', iconKey: 'grid', route: '/main/modules' },
+        { id: 'account-modules', name: 'Módulos por Conta', iconKey: 'link', route: '/main/account-modules' },
         { id: 'subscriptions', name: 'Assinaturas', iconKey: 'receipt', route: '/main/subscriptions' },
         { id: 'storage', name: 'Armazenamento', iconKey: 'cloud', route: '/main/storage' },
-        { id: 'master-users', name: 'Usuarios Master', iconKey: 'users', route: '/main/master-users' },
+        { id: 'master-users', name: 'Usuários Master', iconKey: 'users', route: '/main/master-users' },
         { id: 'tenant-bootstrap', name: 'Onboarding Tenant', iconKey: 'rocket', route: '/main/tenant-bootstrap' }
       ]
     },
@@ -62,17 +62,17 @@ export class MenuComponent {
     },
     {
       id: 'reports',
-      name: 'RELATORIOS',
+      name: 'RELATÓRIOS',
       items: [
-        { id: 'metrics', name: 'Metricas', iconKey: 'chart', route: '/main/metrics' },
+        { id: 'metrics', name: 'Métricas', iconKey: 'chart', route: '/main/metrics' },
         { id: 'financial', name: 'Financeiro', iconKey: 'coin', route: '/main/financial' }
       ]
     },
     {
       id: 'settings',
-      name: 'CONFIGURACOES',
+      name: 'CONFIGURAÇÕES',
       items: [
-        { id: 'settings-page', name: 'Configuracoes', iconKey: 'settings', route: '/main/settings-page' }
+        { id: 'settings-page', name: 'Configurações', iconKey: 'settings', route: '/main/settings-page' }
       ]
     }
   ];

@@ -41,7 +41,7 @@ type ResourceConfig = {
 export class AdminResourcePageComponent {
   @ViewChild('createDialog') createDialog!: DialogComponent;
 
-  title = 'Gestao';
+  title = 'Gestão';
   subtitle = '';
   resource = 'placeholder';
   rows: any[] = [];
@@ -50,7 +50,7 @@ export class AdminResourcePageComponent {
   loading = true;
   saving = false;
   placeholder = false;
-  placeholderMessage = 'Modulo em preparacao.';
+  placeholderMessage = 'Módulo em preparação.';
   dialogMessage = '';
   createForm!: FormGroup;
   searchTerm = '';
@@ -74,13 +74,13 @@ export class AdminResourcePageComponent {
     { id: 'admin', text: 'Administrador' },
     { id: 'manager', text: 'Gestor' },
     { id: 'support', text: 'Suporte' },
-    { id: 'user', text: 'Usuario' }
+    { id: 'user', text: 'Usuário' }
   ];
 
   readonly pageSizeOptions = [
-    { id: 10, text: '10 por pagina' },
-    { id: 20, text: '20 por pagina' },
-    { id: 50, text: '50 por pagina' }
+    { id: 10, text: '10 por página' },
+    { id: 20, text: '20 por página' },
+    { id: 50, text: '50 por página' }
   ];
 
   sortOptions: Array<{ id: string; text: string }> = [];
@@ -103,7 +103,7 @@ export class AdminResourcePageComponent {
 
   ngOnInit(): void {
     this.route.data.subscribe((data) => {
-      this.title = data['title'] ?? 'Gestao';
+      this.title = data['title'] ?? 'Gestão';
       this.subtitle = data['subtitle'] ?? '';
       this.resource = data['resource'] ?? 'placeholder';
       this.configurePage();
@@ -188,7 +188,7 @@ export class AdminResourcePageComponent {
             return;
           }
 
-          this.dialogMessage = error?.error?.message || 'Nao foi possivel salvar o registro.';
+          this.dialogMessage = error?.error?.message || 'Não foi possível salvar o registro.';
           this.pushToast('error', 'Erro de operacao', this.dialogMessage);
         }
       });
@@ -235,7 +235,7 @@ export class AdminResourcePageComponent {
           }
 
           this.placeholder = true;
-          this.placeholderMessage = error?.error?.message || 'Nao foi possivel excluir o registro.';
+          this.placeholderMessage = error?.error?.message || 'Não foi possível excluir o registro.';
           this.pushToast('error', 'Erro de exclusao', this.placeholderMessage);
         }
       });
@@ -325,17 +325,17 @@ export class AdminResourcePageComponent {
 
   disabledReason(row: any): string {
     if (this.resource === 'masterUsers' && this.loginService.getLocalToken()?.user?.id === row?.id) {
-      return 'Voce nao pode remover a propria sessao master.';
+      return 'Você não pode remover a própria sessão master.';
     }
     if (this.resource === 'modules' && ['DIARY', 'PRODUCTION', 'AUDIT'].includes(String(row?.code || '').toUpperCase())) {
-      return 'Os modulos base da plataforma nao devem ser removidos.';
+      return 'Os módulos base da plataforma não devem ser removidos.';
     }
     return '';
   }
 
   exportJson(): void {
     this.downloadBlob('application/json', JSON.stringify(this.filteredRows, null, 2), `${this.resource}-pagina-${this.currentPage}.json`);
-    this.pushToast('info', 'Exportacao JSON', 'Pagina atual exportada com sucesso.');
+    this.pushToast('info', 'Exportação JSON', 'Página atual exportada com sucesso.');
   }
 
   exportCsv(): void {
@@ -346,7 +346,7 @@ export class AdminResourcePageComponent {
     );
     const csv = [headers.join(','), ...rows].join('\n');
     this.downloadBlob('text/csv;charset=utf-8', csv, `${this.resource}-pagina-${this.currentPage}.csv`);
-    this.pushToast('info', 'Exportacao CSV', 'Pagina atual exportada com sucesso.');
+    this.pushToast('info', 'Exportação CSV', 'Página atual exportada com sucesso.');
   }
 
   maskField(controlName: string): void {
@@ -378,18 +378,18 @@ export class AdminResourcePageComponent {
       return '';
     }
     if (control.errors['required']) {
-      return 'Campo obrigatorio.';
+      return 'Campo obrigatório.';
     }
     if (control.errors['email']) {
-      return 'Informe um e-mail valido.';
+      return 'Informe um e-mail válido.';
     }
     if (control.errors['pattern']) {
-      return 'Formato invalido.';
+      return 'Formato inválido.';
     }
     if (control.errors['min']) {
-      return 'Valor abaixo do minimo permitido.';
+      return 'Valor abaixo do mínimo permitido.';
     }
-    return 'Valor invalido.';
+    return 'Valor inválido.';
   }
 
   dismissToast(id: number): void {
@@ -411,6 +411,7 @@ export class AdminResourcePageComponent {
     }
 
     this.placeholder = false;
+    this.loading = true;
     this.rows = [];
     this.filteredRows = [];
     this.planOptions = [];
@@ -423,6 +424,7 @@ export class AdminResourcePageComponent {
     this.columns = config.columns;
     this.sortOptions = config.columns.map((column) => ({ id: column.field, text: column.headerText }));
     this.restoreState(config.sortField);
+    this.flushView();
     this.loadSupportOptions();
     this.loadPage();
   }
@@ -438,17 +440,17 @@ export class AdminResourcePageComponent {
           sortField: 'code',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Codigo', width: 180 },
-            { field: 'name', headerText: 'Conta', width: 280 },
+            { field: 'code', headerText: 'Código', width: 180 },
+            { field: 'name', headerText: 'Empresa / Conta', width: 300 },
             { field: 'document', headerText: 'Documento', width: 180 },
             { field: 'email', headerText: 'E-mail', width: 250 },
             { field: 'phone', headerText: 'Telefone', width: 170 },
             { field: 'statusDisplay', headerText: 'Status', width: 140 },
             { field: 'planDisplay', headerText: 'Plano', width: 220 },
-            { field: 'storageLimitDisplay', headerText: 'Limite de armazenamento', width: 200 },
-            { field: 'storageUsedDisplay', headerText: 'Armazenamento usado', width: 190 },
+            { field: 'storageLimitDisplay', headerText: 'Limite de armazenamento', width: 210 },
+            { field: 'storageUsedDisplay', headerText: 'Armazenamento utilizado', width: 210 },
             { field: 'expirationDisplay', headerText: 'Vencimento', width: 150 },
-            { field: 'activeDisplay', headerText: 'Situacao', width: 130 }
+            { field: 'activeDisplay', headerText: 'Situação', width: 130 }
           ]
         };
       case 'plans':
@@ -461,13 +463,13 @@ export class AdminResourcePageComponent {
           supportsPaging: true,
           columns: [
             { field: 'name', headerText: 'Plano', width: 220 },
-            { field: 'description', headerText: 'Descricao', width: 340 },
-            { field: 'priceDisplay', headerText: 'Preco', width: 160 },
-            { field: 'maxCompaniesDisplay', headerText: 'Maximo de empresas', width: 180 },
-            { field: 'maxUsersDisplay', headerText: 'Maximo de usuarios', width: 180 },
-            { field: 'maxWorksDisplay', headerText: 'Maximo de obras', width: 170 },
+            { field: 'description', headerText: 'Descrição', width: 360 },
+            { field: 'priceDisplay', headerText: 'Preço', width: 170 },
+            { field: 'maxCompaniesDisplay', headerText: 'Máximo de empresas', width: 190 },
+            { field: 'maxUsersDisplay', headerText: 'Máximo de usuários', width: 190 },
+            { field: 'maxWorksDisplay', headerText: 'Máximo de obras', width: 180 },
             { field: 'maxStorageDisplay', headerText: 'Armazenamento', width: 170 },
-            { field: 'activeDisplay', headerText: 'Situacao', width: 130 }
+            { field: 'activeDisplay', headerText: 'Situação', width: 130 }
           ]
         };
       case 'modules':
@@ -479,10 +481,10 @@ export class AdminResourcePageComponent {
           sortField: 'name',
           supportsPaging: true,
           columns: [
-            { field: 'code', headerText: 'Codigo', width: 180 },
-            { field: 'name', headerText: 'Nome', width: 240 },
-            { field: 'description', headerText: 'Descricao', width: 380 },
-            { field: 'activeDisplay', headerText: 'Situacao', width: 130 }
+            { field: 'code', headerText: 'Código', width: 180 },
+            { field: 'name', headerText: 'Nome do módulo', width: 260 },
+            { field: 'description', headerText: 'Descrição', width: 420 },
+            { field: 'activeDisplay', headerText: 'Situação', width: 130 }
           ]
         };
       case 'masterUsers':
@@ -499,7 +501,7 @@ export class AdminResourcePageComponent {
             { field: 'email', headerText: 'E-mail', width: 260 },
             { field: 'roleDisplay', headerText: 'Perfil', width: 160 },
             { field: 'phone', headerText: 'Telefone', width: 170 },
-            { field: 'activeDisplay', headerText: 'Situacao', width: 130 }
+            { field: 'activeDisplay', headerText: 'Situação', width: 130 }
           ]
         };
       case 'accountModules':
@@ -512,9 +514,8 @@ export class AdminResourcePageComponent {
           supportsPaging: true,
           columns: [
             { field: 'accountDisplay', headerText: 'Conta', width: 320 },
-            { field: 'moduleDisplay', headerText: 'Modulo', width: 260 },
-            { field: 'moduleCode', headerText: 'Codigo do modulo', width: 180 },
-            { field: 'activeDisplay', headerText: 'Situacao', width: 130 }
+            { field: 'moduleDisplay', headerText: 'Módulo', width: 280 },
+            { field: 'activeDisplay', headerText: 'Situação', width: 130 }
           ]
         };
       default:
@@ -642,7 +643,7 @@ export class AdminResourcePageComponent {
           }
 
           this.placeholder = true;
-          this.placeholderMessage = error?.error?.message || 'Falha na conexao com a base de dados.';
+          this.placeholderMessage = error?.error?.message || 'Falha na conexão com a base de dados.';
           this.rows = [];
           this.filteredRows = [];
         }
@@ -695,7 +696,6 @@ export class AdminResourcePageComponent {
           ...row,
           accountDisplay: row.account_name || this.accountName(row.account_id),
           moduleDisplay: row.module_name || this.moduleName(row.module_code),
-          moduleCode: row.module_code,
           activeDisplay: this.activityLabel(row.active)
         };
       }
@@ -728,7 +728,7 @@ export class AdminResourcePageComponent {
   }
 
   private activityLabel(value: any): string {
-    return this.toBoolean(value) ? 'Ativo' : 'Inativo';
+    return this.toBoolean(value) ? '● Ativo' : '● Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -736,15 +736,15 @@ export class AdminResourcePageComponent {
     if (role === 'admin') return 'Administrador';
     if (role === 'manager') return 'Gestor';
     if (role === 'support') return 'Suporte';
-    if (role === 'user') return 'Usuario';
+    if (role === 'user') return 'Usuário';
     return String(value ?? '-');
   }
 
   private accountStatusLabel(value: any): string {
     const status = Number(value ?? 0);
-    if (status === 1) return 'Ativa';
-    if (status === 2) return 'Suspensa';
-    if (status === 3) return 'Bloqueada';
+    if (status === 1) return '● Ativa';
+    if (status === 2) return '● Suspensa';
+    if (status === 3) return '● Bloqueada';
     return String(value ?? '-');
   }
 
@@ -760,7 +760,7 @@ export class AdminResourcePageComponent {
 
   private moduleName(moduleCode: any): string {
     const option = this.moduleOptions.find((item) => String(item.id) === String(moduleCode));
-    return option?.text?.split(' - ').slice(1).join(' - ') || `Modulo ${moduleCode ?? '-'}`;
+    return option?.text?.split(' - ').slice(1).join(' - ') || `Módulo ${moduleCode ?? '-'}`;
   }
 
   private stateKey(): string {
