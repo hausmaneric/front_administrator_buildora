@@ -407,12 +407,7 @@ export class AdminResourcePageComponent {
     return rows.map((row) => {
       if (this.resource === 'accounts') {
         return {
-          id: row.id,
-          code: row.code,
-          name: row.name,
-          document: row.document,
-          email: row.email,
-          phone: row.phone,
+          ...row,
           status_label: this.accountStatusLabel(row.status),
           plan_name: this.planName(row.plan_id),
           storage_limit_label: this.formatStorage(row.storage_limit_mb),
@@ -424,13 +419,8 @@ export class AdminResourcePageComponent {
 
       if (this.resource === 'plans') {
         return {
-          id: row.id,
-          name: row.name,
-          description: row.description,
+          ...row,
           price_label: this.formatCurrency(row.price),
-          max_companies: row.max_companies,
-          max_users: row.max_users,
-          max_works: row.max_works,
           max_storage_label: this.formatStorage(row.max_storage_mb),
           active_label: this.activityLabel(row.active)
         };
@@ -438,32 +428,24 @@ export class AdminResourcePageComponent {
 
       if (this.resource === 'modules') {
         return {
-          id: row.id,
-          code: row.code,
-          name: row.name,
-          description: row.description,
+          ...row,
           active_label: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'masterUsers') {
         return {
-          id: row.id,
-          name: row.name,
-          login: row.login,
-          email: row.email,
+          ...row,
           role_label: this.roleLabel(row.role),
-          phone: row.phone,
           active_label: this.activityLabel(row.active)
         };
       }
 
       if (this.resource === 'accountModules') {
         return {
-          id: row.id,
+          ...row,
           account_name: row.account_name || this.accountName(row.account_id),
           module_name: row.module_name || this.moduleName(row.module_code),
-          module_code: row.module_code,
           active_label: this.activityLabel(row.active)
         };
       }
@@ -488,7 +470,7 @@ export class AdminResourcePageComponent {
   }
 
   private activityLabel(value: any): string {
-    return value ? 'Ativo' : 'Inativo';
+    return value ? '● Ativo' : '○ Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -502,9 +484,9 @@ export class AdminResourcePageComponent {
 
   private accountStatusLabel(value: any): string {
     const status = Number(value ?? 0);
-    if (status === 1) return 'Ativa';
-    if (status === 2) return 'Suspensa';
-    if (status === 3) return 'Bloqueada';
+    if (status === 1) return '● Ativa';
+    if (status === 2) return '● Suspensa';
+    if (status === 3) return '● Bloqueada';
     return String(value ?? '-');
   }
 

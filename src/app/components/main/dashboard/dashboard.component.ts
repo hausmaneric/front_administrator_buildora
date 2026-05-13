@@ -69,11 +69,11 @@ export class DashboardComponent {
         });
       }))
       .subscribe({
-        next: viewModel => {
+        next: (viewModel) => {
           this.viewModel = viewModel;
           this.cdr.detectChanges();
         },
-        error: error => {
+        error: (error) => {
           this.errorMessage = error?.error?.message || error?.message || 'Falha ao carregar o dashboard administrativo.';
           this.cdr.detectChanges();
         }
@@ -121,7 +121,7 @@ export class DashboardComponent {
   donutBackground(items: Array<{ color: string; value: number }>): string {
     const total = items.reduce((sum, item) => sum + item.value, 0) || 1;
     let start = 0;
-    const segments = items.map(item => {
+    const segments = items.map((item) => {
       const size = (item.value / total) * 100;
       const segment = `${item.color} ${start}% ${start + size}%`;
       start += size;
@@ -139,7 +139,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map(item => item.value), 1);
+    const max = Math.max(...points.map((item) => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     const line = points
@@ -161,7 +161,7 @@ export class DashboardComponent {
 
     const width = 420;
     const height = 210;
-    const max = Math.max(...points.map(item => item.value), 1);
+    const max = Math.max(...points.map((item) => item.value), 1);
     const step = width / Math.max(points.length - 1, 1);
 
     return points
