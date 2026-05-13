@@ -81,4 +81,9 @@ export class LoginService {
   isAuthenticated(): boolean {
     return this.getToken().trim().length > 0;
   }
+
+  isAuthenticationError(message?: string): boolean {
+    const normalized = String(message ?? '').toLowerCase();
+    return normalized.includes('autenticação') || normalized.includes('autenticacao') || normalized.includes('token');
+  }
 }

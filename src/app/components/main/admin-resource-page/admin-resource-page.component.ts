@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
@@ -93,6 +93,7 @@ export class AdminResourcePageComponent {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private loginService: LoginService,
     private adminDataService: AdminDataService,
     private fb: FormBuilder,
@@ -118,10 +119,7 @@ export class AdminResourcePageComponent {
 
     const token = this.loginService.getToken();
     if (!token) {
-      this.placeholder = true;
-      this.placeholderMessage = 'Sessão master não encontrada.';
-      this.loading = false;
-      this.flushView();
+      this.redirectToLogin();
       return;
     }
 
@@ -347,6 +345,7 @@ export class AdminResourcePageComponent {
   private loadPage(): void {
     const token = this.loginService.getToken();
     if (!token) {
+      this.redirectToLogin();
       return;
     }
 
@@ -371,6 +370,11 @@ export class AdminResourcePageComponent {
       .subscribe({
         next: (response) => {
           if (!response?.status) {
+            if (this.isAuthenticationFailure(response?.message)) {
+              this.redirectToLogin();
+              return;
+            }
+
             this.placeholder = true;
             this.placeholderMessage = response?.message || 'Falha ao carregar dados administrativos.';
             this.rows = [];
@@ -395,6 +399,11 @@ export class AdminResourcePageComponent {
           }
         },
         error: (error) => {
+          if (this.isAuthenticationFailure(error?.error?.message)) {
+            this.redirectToLogin();
+            return;
+          }
+
           this.placeholder = true;
           this.placeholderMessage = error?.error?.message || 'Falha na conexão com a base de dados.';
           this.rows = [];
@@ -550,7 +559,7 @@ export class AdminResourcePageComponent {
 
     const token = this.loginService.getToken();
     if (!token) {
-      this.dialogMessage = 'Sessão master não encontrada.';
+      this.redirectToLogin();
       return;
     }
 
@@ -563,6 +572,11 @@ export class AdminResourcePageComponent {
       .subscribe({
         next: (response) => {
           if (!response.status) {
+            if (this.isAuthenticationFailure(response?.message)) {
+              this.redirectToLogin();
+              return;
+            }
+
             this.dialogMessage = response.message || 'Falha ao salvar registro.';
             this.pushToast('error', 'Falha ao salvar', this.dialogMessage);
             return;
@@ -573,6 +587,11 @@ export class AdminResourcePageComponent {
           this.loadPage();
         },
         error: (error) => {
+          if (this.isAuthenticationFailure(error?.error?.message)) {
+            this.redirectToLogin();
+            return;
+          }
+
           this.dialogMessage = error?.error?.message || 'Não foi possível salvar o registro.';
           this.pushToast('error', 'Erro de operação', this.dialogMessage);
         }
@@ -582,6 +601,7 @@ export class AdminResourcePageComponent {
   deleteRow(row: any): void {
     const token = this.loginService.getToken();
     if (!token) {
+      this.redirectToLogin();
       return;
     }
 
@@ -596,6 +616,11 @@ export class AdminResourcePageComponent {
       .subscribe({
         next: (response) => {
           if (!response.status) {
+            if (this.isAuthenticationFailure(response?.message)) {
+              this.redirectToLogin();
+              return;
+            }
+
             this.placeholder = true;
             this.placeholderMessage = response.message || 'Falha ao excluir registro.';
             this.pushToast('error', 'Falha ao excluir', this.placeholderMessage);
@@ -609,6 +634,11 @@ export class AdminResourcePageComponent {
           this.loadPage();
         },
         error: (error) => {
+          if (this.isAuthenticationFailure(error?.error?.message)) {
+            this.redirectToLogin();
+            return;
+          }
+
           this.placeholder = true;
           this.placeholderMessage = error?.error?.message || 'Não foi possível excluir o registro.';
           this.pushToast('error', 'Erro de exclusão', this.placeholderMessage);
@@ -944,5 +974,15 @@ export class AdminResourcePageComponent {
       case 'accountModules': return this.adminDataService.deleteAccountModule(token, id);
       default: return this.adminDataService.deleteModule(token, id);
     }
+  }
+
+  private isAuthenticationFailure(message?: string): boolean {
+    const normalized = String(message ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return normalized.includes('autentic') || normalized.includes('sessao') || normalized.includes('token');
+  }
+
+  private redirectToLogin(): void {
+    this.loginService.clearToken();
+    void this.router.navigate(['/login']);
   }
 }

@@ -54,7 +54,7 @@ export class DashboardComponent {
   ngOnInit(): void {
     const token = this.loginService.getToken();
     if (!token) {
-      this.errorMessage = 'Sessão master não encontrada.';
+      this.redirectToLogin();
       this.loading = false;
       this.cdr.detectChanges();
       return;
@@ -74,7 +74,12 @@ export class DashboardComponent {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message || error?.message || 'Falha ao carregar o dashboard administrativo.';
+          const message = error?.error?.message || error?.message || 'Falha ao carregar o dashboard administrativo.';
+          if (this.isAuthenticationFailure(message)) {
+            this.redirectToLogin();
+            return;
+          }
+          this.errorMessage = message;
           this.cdr.detectChanges();
         }
       });
@@ -171,5 +176,15 @@ export class DashboardComponent {
         return `${index === 0 ? 'M' : 'L'} ${x} ${y}`;
       })
       .join(' ');
+  }
+
+  private isAuthenticationFailure(message?: string): boolean {
+    const normalized = String(message ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return normalized.includes('autentic') || normalized.includes('sessao') || normalized.includes('token');
+  }
+
+  private redirectToLogin(): void {
+    this.loginService.clearToken();
+    void this.router.navigate(['/login']);
   }
 }

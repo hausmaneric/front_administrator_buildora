@@ -140,21 +140,21 @@ export class AdminDashboardService {
     const palette = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444'];
     return plans.map((plan, index) => ({
       label: plan.name,
-      value: accounts.filter(account => Number(account.plan_id) === Number(plan.id)).length,
+      value: accounts.filter((account) => Number(account.plan_id) === Number(plan.id)).length,
       color: palette[index % palette.length]
     }));
   }
 
   private subscriptionDistribution(accounts: AdminAccount[]): DistributionItem[] {
     const now = new Date();
-    const active = accounts.filter(item => item.active).length;
-    const expiringSoon = accounts.filter(item => {
+    const active = accounts.filter((item) => item.active).length;
+    const expiringSoon = accounts.filter((item) => {
       const expiration = new Date(item.expiration_date);
       const diff = expiration.getTime() - now.getTime();
       return diff > 0 && diff <= 7 * 24 * 60 * 60 * 1000;
     }).length;
-    const expired = accounts.filter(item => new Date(item.expiration_date).getTime() < now.getTime()).length;
-    const inactive = accounts.filter(item => item.active === false).length;
+    const expired = accounts.filter((item) => new Date(item.expiration_date).getTime() < now.getTime()).length;
+    const inactive = accounts.filter((item) => item.active === false).length;
 
     return [
       { label: 'Ativas', value: active, color: '#27d796' },
