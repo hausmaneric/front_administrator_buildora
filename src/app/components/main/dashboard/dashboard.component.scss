@@ -45,13 +45,13 @@
 
 .data-grid {
   grid-template-columns: 1.15fr 1fr 0.85fr;
+  align-items: start;
 }
 
 .stat-card,
 .chart-card,
 .data-card,
-.alerts-card,
-.footer-strip {
+.alerts-card {
   padding: 18px;
 }
 
@@ -293,45 +293,10 @@
 .alert-danger .alert-indicator { color: #ff5d5d; }
 .alert-warning .alert-indicator { color: #ffb020; }
 
-.footer-strip {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 8px;
-  align-items: center;
-}
-
-.footer-stat {
-  padding: 4px 12px;
-  border-right: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.footer-stat:last-child {
-  border-right: none;
-}
-
-.footer-label {
-  display: block;
-  color: var(--orbax-text-soft);
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  margin-bottom: 8px;
-}
-
-.footer-stat strong {
-  display: block;
-  font-size: 1.65rem;
-  margin-bottom: 4px;
-}
-
-.footer-stat small {
-  color: #3ce09f;
-}
-
 @media (max-width: 1440px) {
   .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .chart-grid,
-  .data-grid,
-  .footer-strip { grid-template-columns: 1fr; }
+  .data-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 860px) {
