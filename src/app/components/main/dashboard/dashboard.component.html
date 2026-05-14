@@ -108,13 +108,30 @@
           <h3>Últimos acessos</h3>
           <button type="button" (click)="openSection('accounts')">Ver tudo</button>
         </div>
-        <ejs-grid [dataSource]="viewModel.recentAccess" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-          <e-columns>
-            @for (column of accessColumns; track column.field) {
-              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-            }
-          </e-columns>
-        </ejs-grid>
+        <div class="dashboard-table-shell">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Usuário</th>
+                <th>Data e hora</th>
+                <th>IP</th>
+                <th>Conta</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of viewModel.recentAccess; track item.company + item.dateTime) {
+                <tr>
+                  <td>{{ item.company }}</td>
+                  <td>{{ item.user }}</td>
+                  <td>{{ item.dateTime }}</td>
+                  <td>{{ item.ip }}</td>
+                  <td>{{ item.badge }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </article>
 
       <article class="data-card orb-card">
@@ -122,13 +139,28 @@
           <h3>Logs recentes</h3>
           <button type="button" (click)="openSection('logs')">Ver tudo</button>
         </div>
-        <ejs-grid [dataSource]="viewModel.recentLogs" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
-          <e-columns>
-            @for (column of logColumns; track column.field) {
-              <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width"></e-column>
-            }
-          </e-columns>
-        </ejs-grid>
+        <div class="dashboard-table-shell">
+          <table class="dashboard-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data e hora</th>
+                <th>Categoria</th>
+                <th>Prioridade</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of viewModel.recentLogs; track item.title + item.dateTime) {
+                <tr>
+                  <td>{{ item.title }}</td>
+                  <td>{{ item.dateTime }}</td>
+                  <td>{{ item.type }}</td>
+                  <td>{{ item.toneLabel }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       </article>
 
       <article class="alerts-card orb-card">

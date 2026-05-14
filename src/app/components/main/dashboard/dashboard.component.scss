@@ -241,46 +241,43 @@
   padding-top: 10px;
 }
 
-.data-card ::ng-deep .e-gridcontent,
-.data-card ::ng-deep .e-content,
-.data-card ::ng-deep .e-gridheader {
-  border: none !important;
-  overflow-x: hidden !important;
+.dashboard-table-shell {
+  width: 100%;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(9, 24, 44, 0.34);
 }
 
-.data-card ::ng-deep .e-grid,
-.data-card ::ng-deep .e-table,
-.data-card ::ng-deep .e-gridheader table,
-.data-card ::ng-deep .e-gridcontent table {
-  width: 100% !important;
-  min-width: 0 !important;
-  table-layout: fixed !important;
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
 }
 
-.data-card ::ng-deep .e-gridheader,
-.data-card ::ng-deep .e-gridcontent,
-.data-card ::ng-deep .e-content,
-.data-card ::ng-deep .e-grid .e-content {
-  overflow-x: hidden !important;
+.dashboard-table th,
+.dashboard-table td {
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: top;
 }
 
-.data-card ::ng-deep .e-headercell,
-.data-card ::ng-deep .e-rowcell,
-.data-card ::ng-deep .e-headertext {
-  text-align: left !important;
-  overflow: hidden !important;
+.dashboard-table th {
+  color: #dbeafe;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.data-card ::ng-deep .e-headertext {
-  white-space: nowrap !important;
-  text-overflow: ellipsis !important;
+.dashboard-table td {
+  color: #f8fbff;
+  font-size: 0.98rem;
+  line-height: 1.35;
+  word-break: break-word;
 }
 
-.data-card ::ng-deep .e-rowcell {
-  white-space: normal !important;
-  word-break: break-word !important;
-  line-height: 1.35 !important;
-  vertical-align: top !important;
+.dashboard-table tbody tr + tr td {
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .alerts-list {

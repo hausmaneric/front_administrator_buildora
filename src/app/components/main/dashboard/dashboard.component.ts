@@ -1,7 +1,6 @@
 ﻿import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { GridModule, SortService } from '@syncfusion/ej2-angular-grids';
 import { finalize } from 'rxjs';
 import { AdminDashboardViewModel, SummaryCard } from '../../../models/admin-dashboard';
 import { AdminDashboardService } from '../../../services/admin-dashboard.service';
@@ -10,8 +9,7 @@ import { LoginService } from '../../../services/login.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, GridModule],
-  providers: [SortService],
+  imports: [CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -28,21 +26,6 @@ export class DashboardComponent {
     alerts: [],
     footerStats: []
   };
-
-  accessColumns = [
-    { field: 'company', headerText: 'Empresa', width: 220 },
-    { field: 'user', headerText: 'Usuário', width: 220 },
-    { field: 'dateTime', headerText: 'Data e hora', width: 160 },
-    { field: 'ip', headerText: 'IP', width: 140 },
-    { field: 'badge', headerText: 'Conta', width: 150 }
-  ];
-
-  logColumns = [
-    { field: 'title', headerText: 'Evento', width: 280 },
-    { field: 'dateTime', headerText: 'Data e hora', width: 160 },
-    { field: 'type', headerText: 'Categoria', width: 150 },
-    { field: 'toneLabel', headerText: 'Prioridade', width: 140 }
-  ];
 
   constructor(
     private loginService: LoginService,
