@@ -259,6 +259,7 @@
   gap: 6px;
   flex-wrap: nowrap;
   justify-content: flex-start;
+  align-items: center;
 }
 
 .row-action {
@@ -272,6 +273,13 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.row-action.icon-only {
+  width: 34px;
+  min-width: 34px;
+  padding-inline: 0;
+  justify-content: center;
 }
 
 .row-action-icon {

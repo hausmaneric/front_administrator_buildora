@@ -248,10 +248,29 @@
   overflow-x: hidden !important;
 }
 
+.data-card ::ng-deep .e-grid,
+.data-card ::ng-deep .e-table,
+.data-card ::ng-deep .e-gridheader table,
+.data-card ::ng-deep .e-gridcontent table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: fixed !important;
+}
+
+.data-card ::ng-deep .e-gridheader,
+.data-card ::ng-deep .e-gridcontent,
+.data-card ::ng-deep .e-content,
+.data-card ::ng-deep .e-grid .e-content {
+  overflow-x: hidden !important;
+}
+
 .data-card ::ng-deep .e-headercell,
 .data-card ::ng-deep .e-rowcell,
 .data-card ::ng-deep .e-headertext {
   text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
 .alerts-list {

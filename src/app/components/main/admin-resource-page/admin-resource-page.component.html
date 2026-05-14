@@ -91,20 +91,17 @@
             [gridLines]="'Horizontal'"
             [rowHeight]="54">
             <e-columns>
-              <e-column headerText="Ações" [width]="170">
+              <e-column headerText="Ações" [width]="96">
                 <ng-template #template let-data>
                   <div class="row-actions">
-                    <button ejs-button cssClass="row-action edit" type="button" title="Editar registro" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">
+                    <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">
                       <span class="row-action-icon">✎</span>
-                      <span class="row-action-label">Editar</span>
                     </button>
-                    <button ejs-button cssClass="row-action duplicate" type="button" title="Duplicar registro" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">
+                    <button ejs-button cssClass="row-action duplicate icon-only" type="button" title="Duplicar registro" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">
                       <span class="row-action-icon">⧉</span>
-                      <span class="row-action-label">Duplicar</span>
                     </button>
-                    <button ejs-button cssClass="row-action delete" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data) || 'Remover registro'" (click)="deleteRow(data)">
+                    <button ejs-button cssClass="row-action delete icon-only" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data) || 'Remover registro'" (click)="deleteRow(data)">
                       <span class="row-action-icon">✕</span>
-                      <span class="row-action-label">Remover</span>
                     </button>
                   </div>
                 </ng-template>
