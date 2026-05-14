@@ -53,13 +53,29 @@
 
         @if (filteredRows.length) {
           <div class="ops-grid-shell">
-            <ejs-grid [dataSource]="filteredRows" [allowSorting]="true" [allowResizing]="true" [gridLines]="'Horizontal'" [rowHeight]="50">
-              <e-columns>
+            <table class="ops-table" [style.min-width.px]="totalRowsMinWidth()">
+              <colgroup>
                 @for (column of columns; track column.field) {
-                  <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
+                  <col [style.width.px]="column.width || 180" [style.min-width.px]="column.width || 180" />
                 }
-              </e-columns>
-            </ejs-grid>
+              </colgroup>
+              <thead>
+                <tr>
+                  @for (column of columns; track column.field) {
+                    <th [title]="column.headerText">{{ column.headerText }}</th>
+                  }
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of filteredRows; track $index) {
+                  <tr>
+                    @for (column of columns; track column.field) {
+                      <td [title]="row?.[column.field] ?? ''">{{ row?.[column.field] ?? '-' }}</td>
+                    }
+                  </tr>
+                }
+              </tbody>
+            </table>
           </div>
         } @else {
           <div class="empty-grid-state">

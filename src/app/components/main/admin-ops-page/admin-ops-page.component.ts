@@ -2,7 +2,6 @@
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
-import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { Observable, finalize, forkJoin } from 'rxjs';
 import { AdminDataService } from '../../../services/admin-data.service';
@@ -11,8 +10,7 @@ import { LoginService } from '../../../services/login.service';
 @Component({
   selector: 'app-admin-ops-page',
   standalone: true,
-  imports: [CommonModule, GridModule, ButtonModule, TextBoxModule],
-  providers: [ResizeService, SortService],
+  imports: [CommonModule, ButtonModule, TextBoxModule],
   templateUrl: './admin-ops-page.component.html',
   styleUrl: './admin-ops-page.component.scss'
 })
@@ -125,6 +123,10 @@ export class AdminOpsPageComponent {
     const total = this.rows.length;
     const filtered = this.filteredRows.length;
     return filtered === total ? `${total} registros` : `${filtered} de ${total} registros`;
+  }
+
+  totalRowsMinWidth(): number {
+    return this.columns.reduce((sum, column) => sum + Number(column.width || 180), 0);
   }
 
   private requestFor(resource: string, token: string): Observable<any> {
