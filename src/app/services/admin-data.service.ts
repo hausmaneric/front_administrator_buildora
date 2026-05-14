@@ -49,6 +49,10 @@ export class AdminDataService {
     }
   }
 
+  clearCache(): void {
+    this.getCache.clear();
+  }
+
   accounts(token: string, params: Record<string, any> = {}): Observable<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>> {
     const url = `${resources.apiURL}admin/accounts/${token}${this.queryParams(params)}`;
     return Object.keys(params).length ? this.http.get<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>>(url) : this.cachedGet<NxResult<AdminAccount[] | AdminPagedResponse<AdminAccount>>>(url);

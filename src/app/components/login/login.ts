@@ -7,6 +7,7 @@ import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogComponent, DialogModule } from '@syncfusion/ej2-angular-popups';
 import { finalize } from 'rxjs';
 import { MasterLoginPayload } from '../../models/login';
+import { AdminDataService } from '../../services/admin-data.service';
 import { LoginService } from '../../services/login.service';
 
 @Component({
@@ -27,6 +28,7 @@ export class Login {
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
+    private adminDataService: AdminDataService,
     private router: Router
   ) {
     this.loginForm = this.fb.group({
@@ -37,7 +39,7 @@ export class Login {
 
   ngOnInit(): void {
     if (this.loginService.isAuthenticated()) {
-      this.router.navigate(['/main/dashboard']);
+      void this.router.navigate(['/main/dashboard']);
     }
   }
 
@@ -60,11 +62,12 @@ export class Login {
       .subscribe({
         next: (response) => {
           if (response.status) {
+            this.adminDataService.clearCache();
             this.loginService.saveLocalToken({
               token: response.data.token,
               user: response.data.user
             });
-            this.router.navigate(['/main/dashboard']);
+            void this.router.navigate(['/main/dashboard']);
             return;
           }
 

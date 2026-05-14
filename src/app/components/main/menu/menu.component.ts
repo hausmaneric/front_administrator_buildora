@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
+import { AdminDataService } from '../../../services/admin-data.service';
 import { LoginService } from '../../../services/login.service';
 
 type MenuItem = {
@@ -79,6 +80,7 @@ export class MenuComponent {
 
   constructor(
     private router: Router,
+    private adminDataService: AdminDataService,
     private loginService: LoginService
   ) {
     this.router.events
@@ -106,6 +108,7 @@ export class MenuComponent {
   }
 
   logout(): void {
+    this.adminDataService.clearCache();
     this.loginService.clearToken();
     void this.router.navigate(['/login']);
   }

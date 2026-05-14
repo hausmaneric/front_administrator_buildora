@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { ButtonModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
@@ -27,7 +28,8 @@ export class TenantBootstrapPageComponent {
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
-    private adminDataService: AdminDataService
+    private adminDataService: AdminDataService,
+    private router: Router
   ) {
     this.form = this.fb.group({
       account_code: [null, Validators.required],
@@ -59,7 +61,7 @@ export class TenantBootstrapPageComponent {
   ngOnInit(): void {
     const token = this.loginService.getToken();
     if (!token) {
-      this.error = 'Sessão master não encontrada.';
+      this.redirectToLogin();
       this.loading = false;
       return;
     }
@@ -67,7 +69,16 @@ export class TenantBootstrapPageComponent {
     this.adminDataService.accounts(token)
       .pipe(finalize(() => (this.loading = false)))
       .subscribe({
-        next: response => {
+        next: (response) => {
+          if (!response?.status) {
+            if (this.isAuthenticationFailure(response?.message)) {
+              this.redirectToLogin();
+              return;
+            }
+            this.error = response?.message || 'Falha ao carregar contas para o onboarding.';
+            return;
+          }
+
           const rows = this.extractItems(response.data);
           this.accounts = rows.map((item: any) => ({
             id: item.code,
@@ -75,8 +86,12 @@ export class TenantBootstrapPageComponent {
             raw: item
           }));
         },
-        error: error => {
-          this.error = error?.error?.message || 'Falha ao carregar contas para bootstrap.';
+        error: (error) => {
+          if (this.isAuthenticationFailure(error?.error?.message)) {
+            this.redirectToLogin();
+            return;
+          }
+          this.error = error?.error?.message || 'Falha ao carregar contas para o onboarding.';
         }
       });
   }
@@ -89,7 +104,7 @@ export class TenantBootstrapPageComponent {
 
     const token = this.loginService.getToken();
     if (!token) {
-      this.error = 'Sessão master não encontrada.';
+      this.redirectToLogin();
       return;
     }
 
@@ -105,17 +120,36 @@ export class TenantBootstrapPageComponent {
     this.adminDataService.bootstrapTenant(token, accountCode, payload)
       .pipe(finalize(() => (this.saving = false)))
       .subscribe({
-        next: response => {
+        next: (response) => {
           if (!response.status) {
-            this.error = response.message || 'Falha ao executar bootstrap do tenant.';
+            if (this.isAuthenticationFailure(response?.message)) {
+              this.redirectToLogin();
+              return;
+            }
+            this.error = response.message || 'Falha ao executar o bootstrap do tenant.';
             return;
           }
 
           this.message = response.message || 'Bootstrap do tenant executado com sucesso.';
         },
-        error: error => {
-          this.error = error?.error?.message || 'Falha ao executar bootstrap do tenant.';
+        error: (error) => {
+          if (this.isAuthenticationFailure(error?.error?.message)) {
+            this.redirectToLogin();
+            return;
+          }
+          this.error = error?.error?.message || 'Falha ao executar o bootstrap do tenant.';
         }
       });
+  }
+
+  private isAuthenticationFailure(message?: string): boolean {
+    const normalized = String(message ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return normalized.includes('autentic') || normalized.includes('sessao') || normalized.includes('token');
+  }
+
+  private redirectToLogin(): void {
+    this.adminDataService.clearCache();
+    this.loginService.clearToken();
+    void this.router.navigate(['/login']);
   }
 }
