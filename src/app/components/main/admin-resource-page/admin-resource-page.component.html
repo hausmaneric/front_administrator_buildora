@@ -84,33 +84,44 @@
 
       @if (filteredRows.length) {
         <div class="grid-shell">
-          <ejs-grid
-            [dataSource]="filteredRows"
-            [allowResizing]="true"
-            [allowSorting]="true"
-            [gridLines]="'Horizontal'"
-            [rowHeight]="54">
-            <e-columns>
+          <table class="resource-grid">
+            <colgroup>
               @for (column of columns; track column.field) {
-                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
+                <col [style.width.px]="column.width" [style.min-width.px]="column.width" />
               }
-              <e-column headerText="Ações" [width]="132">
-                <ng-template #template let-data>
-                  <div class="row-actions">
-                    <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">
-                      <span class="row-action-icon">✎</span>
-                    </button>
-                    <button ejs-button cssClass="row-action duplicate icon-only" type="button" title="Duplicar registro" [disabled]="!canDuplicate(data)" (click)="openDuplicateDialog(data)">
-                      <span class="row-action-icon">⧉</span>
-                    </button>
-                    <button ejs-button cssClass="row-action delete icon-only" type="button" [disabled]="!canDelete(data)" [title]="disabledReason(data) || 'Remover registro'" (click)="deleteRow(data)">
-                      <span class="row-action-icon">✕</span>
-                    </button>
-                  </div>
-                </ng-template>
-              </e-column>
-            </e-columns>
-          </ejs-grid>
+              <col [style.width.px]="actionColumnWidth()" [style.min-width.px]="actionColumnWidth()" />
+            </colgroup>
+            <thead>
+              <tr>
+                @for (column of columns; track column.field) {
+                  <th [title]="column.headerText">{{ column.headerText }}</th>
+                }
+                <th class="actions-column">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of filteredRows; track row.id ?? row.code ?? $index) {
+                <tr>
+                  @for (column of columns; track column.field) {
+                    <td [title]="row?.[column.field] ?? ''">{{ row?.[column.field] ?? '-' }}</td>
+                  }
+                  <td class="actions-column">
+                    <div class="row-actions">
+                      <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(row)" (click)="openEditDialog(row)">
+                        <span class="row-action-icon">✎</span>
+                      </button>
+                      <button ejs-button cssClass="row-action duplicate icon-only" type="button" title="Duplicar registro" [disabled]="!canDuplicate(row)" (click)="openDuplicateDialog(row)">
+                        <span class="row-action-icon">⧉</span>
+                      </button>
+                      <button ejs-button cssClass="row-action delete icon-only" type="button" [disabled]="!canDelete(row)" [title]="disabledReason(row) || 'Remover registro'" (click)="deleteRow(row)">
+                        <span class="row-action-icon">✕</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
 
         <div class="pager-bar">

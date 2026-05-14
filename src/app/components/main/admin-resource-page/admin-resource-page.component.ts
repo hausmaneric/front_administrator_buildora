@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule, CheckBoxModule } from '@syncfusion/ej2-angular-buttons';
 import { DropDownListModule } from '@syncfusion/ej2-angular-dropdowns';
-import { GridModule, ResizeService, SortService } from '@syncfusion/ej2-angular-grids';
 import { TextBoxModule } from '@syncfusion/ej2-angular-inputs';
 import { DialogComponent, DialogModule } from '@syncfusion/ej2-angular-popups';
 import { Observable, finalize } from 'rxjs';
@@ -33,8 +32,7 @@ type ResourceConfig = {
 @Component({
   selector: 'app-admin-resource-page',
   standalone: true,
-  imports: [CommonModule, GridModule, ReactiveFormsModule, TextBoxModule, DialogModule, ButtonModule, DropDownListModule, CheckBoxModule],
-  providers: [ResizeService, SortService],
+  imports: [CommonModule, ReactiveFormsModule, TextBoxModule, DialogModule, ButtonModule, DropDownListModule, CheckBoxModule],
   templateUrl: './admin-resource-page.component.html',
   styleUrl: './admin-resource-page.component.scss'
 })
@@ -292,6 +290,10 @@ export class AdminResourcePageComponent {
     const start = this.rows.length ? this.offset + 1 : 0;
     const end = this.offset + this.rows.length;
     return `${start}-${end} de ${this.totalItems} registros`;
+  }
+
+  actionColumnWidth(): number {
+    return 168;
   }
 
   dialogTitle(): string {
