@@ -103,7 +103,15 @@
               @for (row of filteredRows; track row.id ?? row.code ?? $index) {
                 <tr>
                   @for (column of columns; track column.field) {
-                    <td [title]="row?.[column.field] ?? ''">{{ row?.[column.field] ?? '-' }}</td>
+                    <td [title]="row?.[column.field] ?? ''">
+                      @if (isBadgeField(column.field)) {
+                        <span class="status-badge" [class]="'status-badge ' + badgeTone(column.field, row?.[column.field])">
+                          {{ row?.[column.field] ?? '-' }}
+                        </span>
+                      } @else {
+                        {{ row?.[column.field] ?? '-' }}
+                      }
+                    </td>
                   }
                   <td class="actions-column">
                     <div class="row-actions">

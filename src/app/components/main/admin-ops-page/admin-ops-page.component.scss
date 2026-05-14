@@ -169,6 +169,38 @@
   border-top: 1px solid rgba(148, 163, 184, 0.08);
 }
 
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.status-badge::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.status-badge.success {
+  color: #7cf2b1;
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.24);
+}
+
+.status-badge.danger {
+  color: #ff9b9b;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
 .ops-state {
   display: grid;
   gap: 8px;

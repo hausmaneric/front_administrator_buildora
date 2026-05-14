@@ -70,7 +70,15 @@
                 @for (row of filteredRows; track $index) {
                   <tr>
                     @for (column of columns; track column.field) {
-                      <td [title]="row?.[column.field] ?? ''">{{ row?.[column.field] ?? '-' }}</td>
+                      <td [title]="row?.[column.field] ?? ''">
+                        @if (isBadgeField(column.field)) {
+                          <span class="status-badge" [class]="'status-badge ' + badgeTone(row?.[column.field])">
+                            {{ row?.[column.field] ?? '-' }}
+                          </span>
+                        } @else {
+                          {{ row?.[column.field] ?? '-' }}
+                        }
+                      </td>
                     }
                   </tr>
                 }

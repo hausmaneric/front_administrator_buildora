@@ -296,6 +296,24 @@ export class AdminResourcePageComponent {
     return 168;
   }
 
+  isBadgeField(field: string): boolean {
+    return ['statusDisplay', 'activeDisplay', 'roleDisplay'].includes(field);
+  }
+
+  badgeTone(field: string, value: any): string {
+    const text = String(value ?? '').toLowerCase();
+    if (field === 'roleDisplay') {
+      return text.includes('admin') ? 'info' : text.includes('suporte') ? 'warning' : 'neutral';
+    }
+    if (text.includes('bloquead') || text.includes('inativ')) {
+      return 'danger';
+    }
+    if (text.includes('suspens')) {
+      return 'warning';
+    }
+    return 'success';
+  }
+
   dialogTitle(): string {
     if (this.dialogMode === 'edit') {
       return `Editar registro - ${this.title}`;
@@ -730,7 +748,7 @@ export class AdminResourcePageComponent {
   }
 
   private activityLabel(value: any): string {
-    return this.toBoolean(value) ? '● Ativo' : '● Inativo';
+    return this.toBoolean(value) ? 'Ativo' : 'Inativo';
   }
 
   private roleLabel(value: any): string {
@@ -744,9 +762,9 @@ export class AdminResourcePageComponent {
 
   private accountStatusLabel(value: any): string {
     const status = Number(value ?? 0);
-    if (status === 1) return '● Ativa';
-    if (status === 2) return '● Suspensa';
-    if (status === 3) return '● Bloqueada';
+    if (status === 1) return 'Ativa';
+    if (status === 2) return 'Suspensa';
+    if (status === 3) return 'Bloqueada';
     return String(value ?? '-');
   }
 

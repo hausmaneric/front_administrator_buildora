@@ -129,6 +129,18 @@ export class AdminOpsPageComponent {
     return this.columns.reduce((sum, column) => sum + Number(column.width || 180), 0);
   }
 
+  isBadgeField(field: string): boolean {
+    return ['ativo', 'tokenRequired'].includes(field);
+  }
+
+  badgeTone(value: any): string {
+    const text = String(value ?? '').toLowerCase();
+    if (text.includes('não') || text.includes('nao') || text.includes('inativo')) {
+      return 'danger';
+    }
+    return 'success';
+  }
+
   private requestFor(resource: string, token: string): Observable<any> {
     switch (resource) {
       case 'subscriptions':
@@ -382,7 +394,7 @@ export class AdminOpsPageComponent {
       conta: item.name,
       plano: plans.find((plan: any) => Number(plan.id) === Number(item.plan_id))?.name ?? `Plano #${item.plan_id}`,
       armazenamento: this.formatStorage(item.storage_used_mb),
-      ativo: item.active ? '● Ativo' : '● Inativo'
+      ativo: item.active ? 'Ativo' : 'Inativo'
     }));
     this.columns = [
       { field: 'conta', headerText: 'Conta', width: 260 },
