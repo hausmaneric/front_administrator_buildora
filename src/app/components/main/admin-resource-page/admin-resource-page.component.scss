@@ -163,7 +163,14 @@
 }
 
 :host ::ng-deep .grid-shell .e-headercontent {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+:host ::ng-deep .grid-shell .e-headercontent::-webkit-scrollbar {
+  display: none;
 }
 
 :host ::ng-deep .grid-shell .e-headercell,
