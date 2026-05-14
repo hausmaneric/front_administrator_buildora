@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -178,7 +178,7 @@ export class AdminResourcePageComponent {
             return;
           }
 
-          this.pushToast('success', this.dialogMode === 'edit' ? 'Registro atualizado' : 'Registro salvo', response.message || 'Operacao concluida com sucesso.');
+          this.pushToast('success', this.dialogMode === 'edit' ? 'Registro atualizado' : 'Registro salvo', response.message || 'Operação concluida com sucesso.');
           this.closeCreateDialog();
           this.loadPage();
         },
@@ -222,7 +222,7 @@ export class AdminResourcePageComponent {
             return;
           }
 
-          this.pushToast('success', 'Registro removido', response.message || 'Exclusao realizada com sucesso.');
+          this.pushToast('success', 'Registro removido', response.message || 'Exclusão realizada com sucesso.');
           if (this.rows.length === 1 && this.offset > 0) {
             this.offset = Math.max(0, this.offset - this.pageSize);
           }
@@ -1022,3 +1022,5 @@ export class AdminResourcePageComponent {
     void this.router.navigate(['/login']);
   }
 }
+
+

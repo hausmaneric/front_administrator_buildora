@@ -2,6 +2,7 @@
   display: grid;
   gap: 14px;
   padding-bottom: 12px;
+  overflow-x: clip;
 }
 
 .dashboard-loading {
@@ -36,15 +37,15 @@
 }
 
 .stats-grid {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
 
 .chart-grid {
-  grid-template-columns: 1fr 1fr 1.25fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 }
 
 .data-grid {
-  grid-template-columns: 1fr 1fr 0.9fr;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
   align-items: start;
 }
 
@@ -53,6 +54,7 @@
 .data-card,
 .alerts-card {
   padding: 16px;
+  min-width: 0;
 }
 
 .stat-card {
@@ -66,6 +68,11 @@
   display: flex;
   gap: 16px;
   align-items: flex-start;
+}
+
+.stat-copy {
+  min-width: 0;
+  text-align: left;
 }
 
 .stat-icon {
@@ -141,6 +148,7 @@
 .data-card-header h3 {
   margin: 0;
   font-size: 1.15rem;
+  text-align: left;
 }
 
 .data-card-header button {
@@ -158,6 +166,7 @@
   align-items: center;
   gap: 16px;
   min-height: 168px;
+  flex-wrap: wrap;
 }
 
 .donut {
@@ -188,6 +197,7 @@
   align-items: center;
   gap: 10px;
   color: var(--orbax-text-soft);
+  text-align: left;
 }
 
 .legend-row strong {
@@ -234,6 +244,12 @@
   border: none !important;
 }
 
+.data-card ::ng-deep .e-headercell,
+.data-card ::ng-deep .e-rowcell,
+.data-card ::ng-deep .e-headertext {
+  text-align: left !important;
+}
+
 .alerts-list {
   display: grid;
   gap: 10px;
@@ -262,6 +278,7 @@
   flex: 1;
   display: grid;
   gap: 6px;
+  text-align: left;
 }
 
 .alert-copy span,
@@ -294,8 +311,6 @@
 .alert-warning .alert-indicator { color: #ffb020; }
 
 @media (max-width: 1440px) {
-  .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .chart-grid,
   .data-grid { grid-template-columns: 1fr; }
 }
 

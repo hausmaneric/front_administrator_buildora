@@ -1,4 +1,4 @@
-@if (loading) {
+﻿@if (loading) {
   <section class="dashboard-loading orb-card">
     <div class="loading-dot"></div>
     <div class="loading-copy">
@@ -20,7 +20,7 @@
         <article class="stat-card orb-card" [class]="'tone-' + card.tone">
           <div class="stat-head">
             <span class="stat-icon"></span>
-            <div>
+            <div class="stat-copy">
               <span class="stat-label">{{ card.title }}</span>
               <h3>{{ card.value }}</h3>
               <p>{{ card.delta }}</p>
@@ -105,7 +105,7 @@
     <div class="data-grid">
       <article class="data-card orb-card">
         <div class="data-card-header">
-          <h3>Ultimos acessos</h3>
+          <h3>Últimos acessos</h3>
           <button type="button" (click)="openSection('accounts')">Ver tudo</button>
         </div>
         <ejs-grid [dataSource]="viewModel.recentAccess" [allowSorting]="true" [gridLines]="'Horizontal'" [rowHeight]="52">
@@ -158,3 +158,5 @@
     </div>
   </section>
 }
+
+

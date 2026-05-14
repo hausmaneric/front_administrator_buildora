@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { GridModule, SortService } from '@syncfusion/ej2-angular-grids';
@@ -188,3 +188,4 @@ export class DashboardComponent {
     void this.router.navigate(['/login']);
   }
 }
+

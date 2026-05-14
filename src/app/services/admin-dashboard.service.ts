@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+﻿import { Injectable } from '@angular/core';
 import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { AdminDashboardViewModel, AlertRow, DistributionItem, LogRow, SummaryCard, TrendPoint } from '../models/admin-dashboard';
 import { AdminAccount, AdminMasterUser, AdminModule, AdminPagedResponse, AdminPlan } from '../models/admin-resource';
@@ -23,8 +23,8 @@ export class AdminDashboardService {
       map(({ accounts, plans, modules, masterUsers, accountModules, environment, ready }) => {
         const accountRows = this.extractItems<AdminAccount>(this.ensureSuccess(accounts, 'contas'));
         const planRows = this.extractItems<AdminPlan>(this.ensureSuccess(plans, 'planos'));
-        const moduleRows = this.extractItems<AdminModule>(this.ensureSuccess(modules, 'modulos'));
-        const masterUserRows = this.extractItems<AdminMasterUser>(this.ensureSuccess(masterUsers, 'usuarios master'));
+        const moduleRows = this.extractItems<AdminModule>(this.ensureSuccess(modules, 'módulos'));
+        const masterUserRows = this.extractItems<AdminMasterUser>(this.ensureSuccess(masterUsers, 'usuários master'));
         const accountModuleRows = this.extractItems<any>(accountModules?.data ?? []);
 
         const activeAccounts = accountRows.filter((item) => item.active === true);
@@ -83,7 +83,7 @@ export class AdminDashboardService {
       {
         title: 'EMPRESAS ATIVAS',
         value: `${accounts.length}`,
-        delta: `+${Math.max(accounts.length, 1)} neste mes`,
+        delta: `+${Math.max(accounts.length, 1)} neste mês`,
         tone: 'blue',
         icon: 'building',
         sparkline: [12, 18, 16, 21, 24, 22, 28, 31]
@@ -91,13 +91,13 @@ export class AdminDashboardService {
       {
         title: 'PLANOS CADASTRADOS',
         value: `${plans.length}`,
-        delta: `+${Math.max(plans.length - 1, 1)} disponiveis`,
+        delta: `+${Math.max(plans.length - 1, 1)} disponíveis`,
         tone: 'green',
         icon: 'briefcase',
         sparkline: [4, 5, 5, 6, 7, 7, 8, 9]
       },
       {
-        title: 'MODULOS DISPONIVEIS',
+        title: 'MÓDULOS DISPONÍVEIS',
         value: `${modules.length}`,
         delta: `+${Math.max(modules.length - 2, 1)} ativos`,
         tone: 'amber',
@@ -105,7 +105,7 @@ export class AdminDashboardService {
         sparkline: [3, 4, 3, 4, 5, 5, 6, 7]
       },
       {
-        title: 'USUARIOS MASTER',
+        title: 'USUÁRIOS MASTER',
         value: `${masterUsers.length}`,
         delta: `+${Math.max(masterUsers.length - 1, 1)} administradores`,
         tone: 'violet',
@@ -176,25 +176,25 @@ export class AdminDashboardService {
   private recentLogs(modules: AdminModule[], ready: any, environment: any): LogRow[] {
     return [
       {
-        title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal precisa de revisao',
+        title: ready?.database_config?.valid ? 'Banco principal validado com sucesso' : 'Banco principal precisa de revisão',
         dateTime: '31/05/2024 10:23',
         type: 'Sistema',
         tone: 'success',
-        toneLabel: ready?.database_config?.valid ? 'Sucesso' : 'Atencao'
+        toneLabel: ready?.database_config?.valid ? 'Sucesso' : 'Atenção'
       },
       {
-        title: `${modules.length} modulos administrativos carregados`,
+        title: `${modules.length} módulos administrativos carregados`,
         dateTime: '31/05/2024 10:15',
-        type: 'Modulo',
+        type: 'Módulo',
         tone: 'info',
         toneLabel: 'Informativo'
       },
       {
-        title: environment?.security?.secret_key_configured ? 'Secret key de producao configurada' : 'Secret key pendente',
+        title: environment?.security?.secret_key_configured ? 'Secret key de produção configurada' : 'Secret key pendente',
         dateTime: '31/05/2024 09:58',
-        type: 'Seguranca',
+        type: 'Segurança',
         tone: environment?.security?.secret_key_configured ? 'success' : 'warning',
-        toneLabel: environment?.security?.secret_key_configured ? 'Sucesso' : 'Atencao'
+        toneLabel: environment?.security?.secret_key_configured ? 'Sucesso' : 'Atenção'
       },
       {
         title: 'Bootstrap master executado com sucesso',
@@ -217,8 +217,8 @@ export class AdminDashboardService {
 
     if (!alertRows.length) {
       alertRows.push({
-        title: 'Ambiente estavel',
-        message: 'Nenhum alerta critico identificado',
+        title: 'Ambiente estável',
+        message: 'Nenhum alerta crítico identificado',
         secondary: `${storagePercent}% de uso consolidado`,
         tone: 'warning'
       });
@@ -243,3 +243,6 @@ export class AdminDashboardService {
     return new Intl.DateTimeFormat('pt-BR').format(date);
   }
 }
+
+
+
