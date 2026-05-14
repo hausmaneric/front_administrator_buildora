@@ -91,7 +91,7 @@
             [gridLines]="'Horizontal'"
             [rowHeight]="54">
             <e-columns>
-              <e-column headerText="Ações" [width]="96" [isFrozen]="true">
+              <e-column headerText="Ações" [width]="96">
                 <ng-template #template let-data>
                   <div class="row-actions">
                     <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">

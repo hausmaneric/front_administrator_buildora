@@ -209,9 +209,25 @@
   min-width: 100% !important;
 }
 
-:host ::ng-deep .grid-shell .e-frozenheader,
-:host ::ng-deep .grid-shell .e-frozencontent {
-  background: transparent !important;
+:host ::ng-deep .grid-shell .e-gridheader,
+:host ::ng-deep .grid-shell .e-gridcontent {
+  scrollbar-width: thin;
+}
+
+:host ::ng-deep .grid-shell .e-headercell:first-child,
+:host ::ng-deep .grid-shell .e-rowcell:first-child {
+  position: sticky !important;
+  left: 0;
+  z-index: 3;
+  background: #102744 !important;
+}
+
+:host ::ng-deep .grid-shell .e-headercell:first-child {
+  z-index: 5;
+}
+
+:host ::ng-deep .grid-shell .e-row:hover .e-rowcell:first-child {
+  background: #143055 !important;
 }
 
 :host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
