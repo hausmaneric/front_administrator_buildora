@@ -94,7 +94,7 @@
               @for (column of columns; track column.field) {
                 <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
               }
-              <e-column headerText="Ações" [width]="96">
+              <e-column headerText="Ações" [width]="132">
                 <ng-template #template let-data>
                   <div class="row-actions">
                     <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(data)" (click)="openEditDialog(data)">

@@ -268,9 +268,19 @@
 .data-card ::ng-deep .e-rowcell,
 .data-card ::ng-deep .e-headertext {
   text-align: left !important;
-  white-space: nowrap !important;
   overflow: hidden !important;
+}
+
+.data-card ::ng-deep .e-headertext {
+  white-space: nowrap !important;
   text-overflow: ellipsis !important;
+}
+
+.data-card ::ng-deep .e-rowcell {
+  white-space: normal !important;
+  word-break: break-word !important;
+  line-height: 1.35 !important;
+  vertical-align: top !important;
 }
 
 .alerts-list {
