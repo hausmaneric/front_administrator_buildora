@@ -109,7 +109,14 @@
           <button type="button" (click)="openSection('accounts')">Ver tudo</button>
         </div>
         <div class="dashboard-table-shell">
-          <table class="dashboard-table">
+          <table class="dashboard-table access-table">
+            <colgroup>
+              <col style="width: 25%" />
+              <col style="width: 25%" />
+              <col style="width: 18%" />
+              <col style="width: 16%" />
+              <col style="width: 16%" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Empresa</th>
@@ -120,13 +127,19 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of viewModel.recentAccess; track item.company + item.dateTime) {
+              @if (viewModel.recentAccess.length) {
+                @for (item of viewModel.recentAccess; track item.company + item.dateTime) {
+                  <tr>
+                    <td>{{ item.company }}</td>
+                    <td>{{ item.user }}</td>
+                    <td>{{ item.dateTime }}</td>
+                    <td>{{ item.ip }}</td>
+                    <td>{{ item.badge }}</td>
+                  </tr>
+                }
+              } @else {
                 <tr>
-                  <td>{{ item.company }}</td>
-                  <td>{{ item.user }}</td>
-                  <td>{{ item.dateTime }}</td>
-                  <td>{{ item.ip }}</td>
-                  <td>{{ item.badge }}</td>
+                  <td colspan="5" class="empty-cell">Nenhum acesso recente registrado.</td>
                 </tr>
               }
             </tbody>
@@ -140,7 +153,13 @@
           <button type="button" (click)="openSection('logs')">Ver tudo</button>
         </div>
         <div class="dashboard-table-shell">
-          <table class="dashboard-table">
+          <table class="dashboard-table logs-table">
+            <colgroup>
+              <col style="width: 44%" />
+              <col style="width: 22%" />
+              <col style="width: 18%" />
+              <col style="width: 16%" />
+            </colgroup>
             <thead>
               <tr>
                 <th>Evento</th>
@@ -150,12 +169,18 @@
               </tr>
             </thead>
             <tbody>
-              @for (item of viewModel.recentLogs; track item.title + item.dateTime) {
+              @if (viewModel.recentLogs.length) {
+                @for (item of viewModel.recentLogs; track item.title + item.dateTime) {
+                  <tr>
+                    <td>{{ item.title }}</td>
+                    <td>{{ item.dateTime }}</td>
+                    <td>{{ item.type }}</td>
+                    <td>{{ item.toneLabel }}</td>
+                  </tr>
+                }
+              } @else {
                 <tr>
-                  <td>{{ item.title }}</td>
-                  <td>{{ item.dateTime }}</td>
-                  <td>{{ item.type }}</td>
-                  <td>{{ item.toneLabel }}</td>
+                  <td colspan="4" class="empty-cell">Nenhum log recente disponível.</td>
                 </tr>
               }
             </tbody>
