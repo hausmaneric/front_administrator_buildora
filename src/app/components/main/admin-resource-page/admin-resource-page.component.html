@@ -91,6 +91,9 @@
             [gridLines]="'Horizontal'"
             [rowHeight]="54">
             <e-columns>
+              @for (column of columns; track column.field) {
+                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
+              }
               <e-column headerText="Ações" [width]="96">
                 <ng-template #template let-data>
                   <div class="row-actions">
@@ -106,9 +109,6 @@
                   </div>
                 </ng-template>
               </e-column>
-              @for (column of columns; track column.field) {
-                <e-column [field]="column.field" [headerText]="column.headerText" [width]="column.width" clipMode="EllipsisWithTooltip"></e-column>
-              }
             </e-columns>
           </ejs-grid>
         </div>

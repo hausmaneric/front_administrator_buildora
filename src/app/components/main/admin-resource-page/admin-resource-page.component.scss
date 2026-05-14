@@ -163,7 +163,7 @@
 }
 
 :host ::ng-deep .grid-shell .e-headercontent {
-  overflow-x: auto !important;
+  overflow-x: hidden !important;
 }
 
 :host ::ng-deep .grid-shell .e-headercell,
@@ -209,25 +209,9 @@
   min-width: 100% !important;
 }
 
-:host ::ng-deep .grid-shell .e-gridheader,
-:host ::ng-deep .grid-shell .e-gridcontent {
+:host ::ng-deep .grid-shell .e-gridcontent,
+:host ::ng-deep .grid-shell .e-content {
   scrollbar-width: thin;
-}
-
-:host ::ng-deep .grid-shell .e-headercell:first-child,
-:host ::ng-deep .grid-shell .e-rowcell:first-child {
-  position: sticky !important;
-  left: 0;
-  z-index: 3;
-  background: #102744 !important;
-}
-
-:host ::ng-deep .grid-shell .e-headercell:first-child {
-  z-index: 5;
-}
-
-:host ::ng-deep .grid-shell .e-row:hover .e-rowcell:first-child {
-  background: #143055 !important;
 }
 
 :host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
