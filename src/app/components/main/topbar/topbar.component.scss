@@ -6,6 +6,7 @@
   padding: 18px 22px;
   margin-bottom: 18px;
   border-radius: 22px;
+  overflow: hidden;
 }
 
 .topbar-left,
@@ -22,6 +23,7 @@
 .topbar-right {
   flex-wrap: wrap;
   justify-content: flex-end;
+  min-width: 0;
 }
 
 .menu-btn {
@@ -94,7 +96,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  min-width: 300px;
+  min-width: 0;
+  width: min(100%, 310px);
   padding: 0 14px;
   border-radius: 14px;
   border: 1px solid rgba(148, 163, 184, 0.12);

@@ -2,6 +2,7 @@
   display: grid;
   gap: 12px;
   padding-bottom: 12px;
+  min-width: 0;
 }
 
 .toast-stack {
@@ -48,6 +49,7 @@
 
 .resource-body {
   padding: 16px 18px;
+  min-width: 0;
 }
 
 .resource-topline {
@@ -135,6 +137,7 @@
   scrollbar-color: rgba(91, 126, 186, 0.9) transparent;
   scrollbar-width: thin;
   margin-bottom: 10px;
+  min-width: 0;
 }
 
 :host ::ng-deep .grid-shell .e-grid {
@@ -203,7 +206,7 @@
 
 :host ::ng-deep .grid-shell .e-table {
   width: max-content !important;
-  min-width: 1180px !important;
+  min-width: 100% !important;
 }
 
 :host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
@@ -253,18 +256,34 @@
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: nowrap;
   justify-content: flex-start;
 }
 
 .row-action {
   min-height: 34px;
-  min-width: 78px;
+  min-width: 0;
+  padding-inline: 10px;
   border-radius: 10px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.row-action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  text-align: center;
+}
+
+.row-action-label {
+  line-height: 1;
 }
 
 .row-action.edit {

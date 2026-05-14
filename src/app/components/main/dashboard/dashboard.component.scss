@@ -2,7 +2,8 @@
   display: grid;
   gap: 14px;
   padding-bottom: 12px;
-  overflow-x: clip;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
 .dashboard-loading {
@@ -34,18 +35,19 @@
 .data-grid {
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .stats-grid {
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .chart-grid {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .data-grid {
-  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(320px, 0.9fr);
   align-items: start;
 }
 
@@ -55,6 +57,7 @@
 .alerts-card {
   padding: 16px;
   min-width: 0;
+  overflow: hidden;
 }
 
 .stat-card {
@@ -242,6 +245,7 @@
 .data-card ::ng-deep .e-content,
 .data-card ::ng-deep .e-gridheader {
   border: none !important;
+  overflow-x: hidden !important;
 }
 
 .data-card ::ng-deep .e-headercell,
@@ -310,12 +314,31 @@
 .alert-danger .alert-indicator { color: #ff5d5d; }
 .alert-warning .alert-indicator { color: #ffb020; }
 
-@media (max-width: 1440px) {
-  .data-grid { grid-template-columns: 1fr; }
+@media (max-width: 1540px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .data-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1180px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 860px) {
-  .stats-grid { grid-template-columns: 1fr; }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
   .donut-layout {
     flex-direction: column;
     align-items: flex-start;
