@@ -153,17 +153,17 @@
 }
 
 :host ::ng-deep .grid-shell .e-gridcontent {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   overflow-y: hidden !important;
 }
 
 :host ::ng-deep .grid-shell .e-content {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
   overflow-y: auto !important;
 }
 
 :host ::ng-deep .grid-shell .e-headercontent {
-  overflow-x: hidden !important;
+  overflow-x: auto !important;
 }
 
 :host ::ng-deep .grid-shell .e-headercell,
@@ -207,6 +207,11 @@
 :host ::ng-deep .grid-shell .e-table {
   width: max-content !important;
   min-width: 100% !important;
+}
+
+:host ::ng-deep .grid-shell .e-frozenheader,
+:host ::ng-deep .grid-shell .e-frozencontent {
+  background: transparent !important;
 }
 
 :host ::ng-deep .grid-shell .e-grid .e-row:hover .e-rowcell {
