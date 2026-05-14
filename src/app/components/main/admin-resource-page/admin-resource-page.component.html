@@ -96,7 +96,7 @@
                 @for (column of columns; track column.field) {
                   <th [title]="column.headerText">{{ column.headerText }}</th>
                 }
-                <th class="actions-column">Ações</th>
+                <th class="actions-column sticky-right">Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -113,7 +113,7 @@
                       }
                     </td>
                   }
-                  <td class="actions-column">
+                  <td class="actions-column sticky-right">
                     <div class="row-actions">
                       <button ejs-button cssClass="row-action edit icon-only" type="button" title="Editar registro" [disabled]="!canEdit(row)" (click)="openEditDialog(row)">
                         <span class="row-action-icon">✎</span>

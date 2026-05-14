@@ -293,7 +293,7 @@ export class AdminResourcePageComponent {
   }
 
   actionColumnWidth(): number {
-    return 168;
+    return 186;
   }
 
   isBadgeField(field: string): boolean {

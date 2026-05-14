@@ -138,6 +138,7 @@
   scrollbar-width: thin;
   margin-bottom: 10px;
   min-width: 0;
+  position: relative;
 }
 
 .resource-grid {
@@ -179,9 +180,30 @@
   background: rgba(47, 111, 255, 0.08);
 }
 
+.resource-grid tbody tr:hover td.sticky-right {
+  background: rgba(20, 41, 73, 0.98);
+}
+
 .resource-grid .actions-column {
-  width: 168px;
-  min-width: 168px;
+  width: 186px;
+  min-width: 186px;
+  max-width: 186px;
+}
+
+.resource-grid .sticky-right {
+  position: sticky;
+  right: 0;
+  z-index: 2;
+}
+
+.resource-grid th.sticky-right {
+  background: rgba(16, 34, 61, 0.98);
+  box-shadow: -1px 0 0 rgba(148, 163, 184, 0.12);
+}
+
+.resource-grid td.sticky-right {
+  background: rgba(11, 27, 49, 0.96);
+  box-shadow: -1px 0 0 rgba(148, 163, 184, 0.1);
 }
 
 .status-badge {
@@ -279,7 +301,7 @@
   display: flex;
   gap: 6px;
   flex-wrap: nowrap;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
   width: 100%;
 }
